@@ -20,6 +20,9 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls import include
+from django.views.generic import RedirectView
+
+from hive_sbi_api.v1.router import api_v1_urlpatterns as api_v1
 
 
 schema_view = get_schema_view(
@@ -29,11 +32,12 @@ schema_view = get_schema_view(
     )
 )
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path('', RedirectView.as_view(url='docs')),
     path('docs/', schema_view.with_ui()),
+    path('api/', RedirectView.as_view(url='v1')),
+    path('api/v1/', include((api_v1, 'v1'), namespace='v1')),
 ]
 
 if settings.DEBUG:

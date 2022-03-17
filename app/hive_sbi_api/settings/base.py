@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     'drf_yasg',
 ] + INSTALLED_APPS
 
+INSTALLED_APPS = [
+    'hive_sbi_api.v1',
+]  + INSTALLED_APPS
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
