@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  app:
+    image: hive_sbi_api:0.1.0
+    build:
+      args:
+        - DJANGO_ENV=prod
+    expose:
+      - "8009"
+    command: ["/app/boot_scripts/wait-for-it.sh", "postgres:5432", "--", "sh", "/app/boot_scripts/app.sh"]
+
+  postgres:
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+
+volumes:
+  db-data:
