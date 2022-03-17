@@ -7,7 +7,7 @@ services:
         - DJANGO_ENV=prod
     expose:
       - "8009"
-    command: ["/app/boot_scripts/wait-for-it.sh", "postgres:5432", "--", "sh", "/app/boot_scripts/app.sh"]
+    command: ["sh", "/app/boot_scripts/app.sh"]
 
   postgres:
     volumes:
