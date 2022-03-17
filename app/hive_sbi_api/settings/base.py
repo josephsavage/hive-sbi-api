@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 ] + INSTALLED_APPS
 
 INSTALLED_APPS = [
+    'hive_sbi_api.core',
     'hive_sbi_api.v1',
 ]  + INSTALLED_APPS
 
