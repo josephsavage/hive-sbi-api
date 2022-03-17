@@ -15,6 +15,7 @@ Including another URLconf
 """
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 
 from django.contrib import admin
 from django.urls import path
@@ -27,14 +28,17 @@ from hive_sbi_api.v1.router import api_v1_urlpatterns as api_v1
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="SBI API",
+        title="Hive - SBI API",
         default_version='v1',
-    )
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='docs')),
+
     path('docs/', schema_view.with_ui()),
     path('api/', RedirectView.as_view(url='v1')),
     path('api/v1/', include((api_v1, 'v1'), namespace='v1')),
