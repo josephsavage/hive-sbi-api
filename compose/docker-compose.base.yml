@@ -26,6 +26,40 @@ services:
     networks:
       - sbi-bridge
 
+  redis:
+    image: redis:5.0.0-alpine
+    networks:
+      - sbi-bridge
+
+  worker:
+    image: ${IMAGE_SERVICE}
+    build: ./app
+    volumes:
+      - ./app:/app
+    env_file: .env
+    depends_on:
+      - app
+      - redis
+    command: ["sh", "/app/boot_scripts/worker.sh"]
+    networks:
+      - sbi-bridge
+
+  beat:
+    image: ${IMAGE_SERVICE}
+    build: ./app
+    volumes:
+      - ./app:/app
+    env_file: .env
+    depends_on:
+      - worker
+    command: ["sh", "/app/boot_scripts/beat.sh"]
+    networks:
+      - sbi-bridge
+
+
+
+
+
 networks:
   sbi-bridge:
     external: True

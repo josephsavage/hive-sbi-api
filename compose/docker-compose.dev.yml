@@ -15,5 +15,19 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/
 
+  worker:
+    environment:
+      - DJANGO_SETTINGS_MODULE=hive_sbi_api.settings.dev
+    build:
+      args:
+        - DJANGO_ENV=dev
+
+  beat:
+    environment:
+      - DJANGO_SETTINGS_MODULE=hive_sbi_api.settings.dev
+    build:
+      args:
+        - DJANGO_ENV=dev
+
 volumes:
   db-data:

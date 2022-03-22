@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 ]
 
 INSTALLED_APPS = [
+    'django_celery_results',
     'rest_framework',
     'django_filters',
     'drf_yasg',
@@ -157,3 +158,6 @@ SWAGGER_SETTINGS = {
    'USE_SESSION_AUTH': False,
    'SECURITY_DEFINITIONS': None,
 }
+
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'django-db'
