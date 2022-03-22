@@ -19,6 +19,10 @@ LOGGING = {
             'level': 'INFO',
             'handlers': ['console'],
         },
+        'sbi': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
         'webapp': {
             'level': 'INFO',
             'handlers': ['console'],

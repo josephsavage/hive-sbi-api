@@ -13,5 +13,26 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/
 
+  redis:
+    volumes:
+      - redis-data:/data
+
+  worker:
+    image: hive_sbi_api:0.1.0
+    environment:
+      - DJANGO_SETTINGS_MODULE=hive_sbi_api.settings.prod
+    build:
+      args:
+        - DJANGO_ENV=prod
+
+  beat:
+    image: hive_sbi_api:0.1.0
+    environment:
+      - DJANGO_SETTINGS_MODULE=hive_sbi_api.settings.prod
+    build:
+      args:
+        - DJANGO_ENV=prod
+
 volumes:
   db-data:
+  redis-data:
