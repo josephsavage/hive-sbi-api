@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 INSTALLED_APPS = [
     'hive_sbi_api.core',
     'hive_sbi_api.v1',
+    'hive_sbi_api.sbi',
 ]  + INSTALLED_APPS
 
 MIDDLEWARE = [
@@ -93,6 +94,14 @@ DATABASES = {
         'HOST':     os.environ.get('POSTGRES_HOST',     ''),
         'PORT':     os.environ.get('POSTGRES_PORT',     ''),
     },
+    'sbi': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('SBI_DB_NAME', ''),
+        'USER': os.environ.get('SBI_DB_USER', ''),
+        'PASSWORD': os.environ.get('SBI_DB_PASSWORD', ''),
+        'HOST': os.environ.get('SBI_DB_HOST', ''),
+        'PORT': os.environ.get('SBI_DB_PORT', ''),
+    }
 }
 
 
