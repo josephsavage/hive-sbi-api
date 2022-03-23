@@ -1,6 +1,73 @@
 from django.db import models
 
 
+class Configuration(models.Model):
+    share_cycle_min = models.FloatField(
+        default=144,
+    )
+
+    sp_share_ratio = models.FloatField(
+        default=2,
+    )
+
+    rshares_per_cycle = models.BigIntegerField(
+        null=True,
+        default=800000000,
+    )
+
+    del_rshares_per_cycle = models.BigIntegerField(
+        default=800000000,
+    )
+
+    comment_vote_divider = models.FloatField(
+        null=True,
+    )
+
+    comment_vote_timeout_h = models.FloatField(
+        null=True,
+    )
+
+    last_cycle = models.DateTimeField(
+        null=True,
+    )
+
+    upvote_multiplier = models.FloatField(
+        default=1.05,
+    )
+
+    upvote_multiplier_adjusted = models.FloatField(
+        default=1,
+    )
+
+    last_paid_post = models.DateTimeField(
+        null=True,
+    )
+
+    last_paid_comment = models.DateTimeField()
+
+    minimum_vote_threshold = models.BigIntegerField(
+        default=800000000,
+    )
+
+    last_delegation_check = models.DateTimeField(
+        null=True,
+    )
+
+    comment_footer = models.TextField(
+        null=True,
+    )
+
+    def __str__(self):
+        return "Configuration"
+
+    class Meta:
+        verbose_name = 'configuration'
+        verbose_name_plural = 'configuration'
+
+
+SBI_CONF = Configuration.objects.first()
+
+
 class Member(models.Model):
     account = models.CharField(
         unique=True,
@@ -89,6 +156,33 @@ class Member(models.Model):
 
     hivewatchers = models.BooleanField()
     buildawhale = models.BooleanField()
+
+    @property
+    def pending_balance(self):
+        return self.balance_rshares / SBI_CONF.minimum_vote_threshold * 0.02
+
+    @property
+    def next_upvote_estimate(self):
+        return self.pending_balance / SBI_CONF.comment_vote_divider
+
+    @property
+    def estimate_rewarded(self):
+     return self.rewarded_rshares / SBI_CONF.minimum_vote_threshold * 0.02
+
+
+    @property
+    def skiplist(self):
+        if self.blacklisted:
+            skiplist = True
+        elif self.blacklisted is False:
+            skiplist = False
+        elif self.blacklisted is None:
+            if self.buildawhale or self.hivewatchers:
+                skiplist = True
+            else:
+                skiplist = False
+
+        return skiplist
 
     def __str__(self):
         return self.account

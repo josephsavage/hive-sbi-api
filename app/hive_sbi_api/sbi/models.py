@@ -108,3 +108,56 @@ class SBIMember(models.Model):
         managed = False
         db_table = 'member'
 
+
+
+class SBIConfiguration(models.Model):
+    objects = SBIManager()
+
+    share_cycle_min = models.FloatField()
+
+    sp_share_ratio = models.FloatField()
+
+    rshares_per_cycle = models.BigIntegerField(
+        null=True,
+    )
+
+    del_rshares_per_cycle = models.BigIntegerField()
+
+    comment_vote_divider = models.FloatField(
+        null=True,
+    )
+
+    comment_vote_timeout_h = models.FloatField(
+        null=True,
+    )
+
+    last_cycle = models.DateTimeField(
+        null=True,
+    )
+
+    upvote_multiplier = models.FloatField()
+
+    upvote_multiplier_adjusted = models.FloatField()
+
+    last_paid_post = models.DateTimeField(
+        null=True,
+    )
+
+    last_paid_comment = models.DateTimeField()
+
+    minimum_vote_threshold = models.BigIntegerField()
+
+    last_delegation_check = models.DateTimeField(
+        null=True,
+    )
+
+    comment_footer = models.TextField(
+        null=True,
+    )
+
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        managed = False
+        db_table = 'configuration'

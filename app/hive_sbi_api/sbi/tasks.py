@@ -11,9 +11,13 @@ from celery.schedules import crontab
 from django_celery_results.models import TaskResult
 
 from django.db.utils import IntegrityError
+from django.forms.models import model_to_dict
 
-from hive_sbi_api.sbi.models import SBIMember
-from hive_sbi_api.core.models import Member
+from hive_sbi_api.sbi.models import (SBIMember,
+                                     SBIConfiguration)
+from hive_sbi_api.core.models import (Member,
+                                      Configuration)
+
 
 
 logger = logging.getLogger('sbi')
@@ -24,7 +28,7 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour="*/2", minute='*/24'),
+        timedelta(minutes=144).seconds,
         sync_members.s(),
         name='sync members',
     )
@@ -35,8 +39,20 @@ def setup_periodic_tasks(sender, **kwargs):
         name='clean_task_results',
     )
 
+
+def sync_conf():
+    sbi_conf = SBIConfiguration.objects.first()
+    conf = Configuration.objects.first()
+
+    for attr, value in model_to_dict(sbi_conf).items():
+        setattr(conf, attr, value)
+    conf.save()
+
+
 @app.task(bind=True)
 def sync_members(self):
+    sync_conf()
+
     SBImembers = SBIMember.objects.all()
 
     created_members = 0
