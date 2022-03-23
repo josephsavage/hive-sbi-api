@@ -151,7 +151,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_METADATA_CLASS': None,
-    'PAGE_SIZE': 15,
+    'PAGE_SIZE': 50,
 }
 
 SWAGGER_SETTINGS = {

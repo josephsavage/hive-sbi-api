@@ -1,9 +1,8 @@
 from rest_framework import routers
-
-from .views import UserViewSet
+from .views import MemberViewSet
 
 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
+router.register(r'members', MemberViewSet)
 
 api_v1_urlpatterns = router.urls

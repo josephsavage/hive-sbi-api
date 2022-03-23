@@ -1,17 +1,22 @@
+import logging
+
 from rest_framework.mixins import (ListModelMixin,
                                    RetrieveModelMixin)
 
 from rest_framework.viewsets import GenericViewSet
 
-
-from django.contrib.auth import get_user_model
-
-from .serializers import UserSerializer 
+from hive_sbi_api.core.models import Member
+from .serializers import MemberSerializer 
 
 
-class UserViewSet(ListModelMixin,
+logger = logging.getLogger('v1')
+
+
+class MemberViewSet(ListModelMixin,
                   RetrieveModelMixin,
                   GenericViewSet):
+    lookup_value_regex = '[^/]+'
+    lookup_field = 'account'
 
-    queryset = get_user_model().objects.all()
-    serializer_class = UserSerializer
+    queryset = Member.objects.all()
+    serializer_class = MemberSerializer
