@@ -4,9 +4,16 @@ import requests
 from datetime import datetime
 from datetime import timedelta
 
-from celery import current_app
+from celery import (current_app,
+                    states as celery_states)
+from celery.exceptions import Ignore
 from celery.schedules import crontab
 from django_celery_results.models import TaskResult
+
+from django.db.utils import IntegrityError
+
+from hive_sbi_api.sbi.models import SBIMember
+from hive_sbi_api.core.models import Member
 
 
 logger = logging.getLogger('sbi')
@@ -17,7 +24,7 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute='*/1'),
+        crontab(minute='*/5'),
         sync_members.s(),
         name='sync members',
     )
@@ -30,9 +37,130 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task(bind=True)
 def sync_members(self):
-    logger.debug("Sync Members ##############################################")
+    SBImembers = SBIMember.objects.all()
 
-    return "Good Work"
+    created_members = 0
+    members_to_update = []
+
+    failured_members_sync = {}
+
+    for sbi_member in SBImembers:
+        # Validate negative values FOR curation_rshares,
+        # and other_rshares, rewarded_rshares.
+        curation_rshares = sbi_member.curation_rshares
+
+        if curation_rshares < 0:
+            curation_rshares = 0
+
+        other_rshares = sbi_member.other_rshares
+
+        if other_rshares < 0:
+            other_rshares = 0
+
+        other_rshares = sbi_member.other_rshares
+
+        if other_rshares < 0:
+            other_rshares = 0
+
+        rewarded_rshares = sbi_member.rewarded_rshares
+
+        if rewarded_rshares < 0:
+            rewarded_rshares = 0
+
+        # Validate boolean fields.
+        # hivewatchers and buildawhale. 
+        hivewatchers = sbi_member.hivewatchers
+
+        if hivewatchers is None:
+            hivewatchers = False
+
+        buildawhale = sbi_member.buildawhale
+
+        if buildawhale is None:
+            buildawhale = False
+
+        data_dict = {
+            'note': sbi_member.note,
+            'shares': sbi_member.shares,
+            'bonus_shares': sbi_member.bonus_shares,
+            'total_share_days': sbi_member.total_share_days,
+            'avg_share_age': sbi_member.avg_share_age,
+            'last_comment': sbi_member.last_comment,
+            'last_post': sbi_member.last_post,
+            'original_enrollment': sbi_member.original_enrollment,
+            'latest_enrollment': sbi_member.latest_enrollment,
+            'flags': sbi_member.flags,
+            'earned_rshares': sbi_member.earned_rshares,
+            'subscribed_rshares': sbi_member.subscribed_rshares,
+            'curation_rshares': curation_rshares,
+            'delegation_rshares': sbi_member.delegation_rshares,
+            'other_rshares': other_rshares,
+            'rewarded_rshares': rewarded_rshares,
+            'balance_rshares': sbi_member.balance_rshares,
+            'upvote_delay': sbi_member.upvote_delay,
+            'updated_at': sbi_member.updated_at,
+            'first_cycle_at': sbi_member.first_cycle_at,
+            'last_received_vote': sbi_member.last_received_vote,
+            'blacklisted': sbi_member.blacklisted,
+            'hivewatchers': hivewatchers,
+            'buildawhale': buildawhale,
+        }
+
+        try:
+            obj, created = Member.objects.get_or_create(
+                account=sbi_member.account,
+                defaults=data_dict,
+            )
+
+            if created:
+                created_members += 1
+            else:
+                for attr, value in data_dict.items(): 
+                    setattr(obj, attr, value)
+                members_to_update.append(obj)
+
+        except IntegrityError as e:
+            failured_members_sync[sbi_member.account] = "{}".format(e)
+            continue
+
+    updated_member = Member.objects.bulk_update(
+        members_to_update,
+        [
+            'note',
+            'shares',
+            'bonus_shares',
+            'total_share_days',
+            'avg_share_age',
+            'last_comment',
+            'last_post',
+            'latest_enrollment',
+            'flags',
+            'earned_rshares',
+            'subscribed_rshares',
+            'curation_rshares',
+            'delegation_rshares',
+            'other_rshares',
+            'rewarded_rshares',
+            'balance_rshares',
+            'upvote_delay',
+            'updated_at',
+            'first_cycle_at',
+            'last_received_vote',
+            'blacklisted',
+            'hivewatchers',
+            'buildawhale',
+        ]
+    )
+
+    if failured_members_sync:
+        self.update_state(
+            state=celery_states.FAILURE,
+            meta=failured_members_sync,
+        )
+
+        raise Ignore()
+
+    return "Created {} members. Updated {} members".format(created_members, updated_member)
 
 
 @app.task

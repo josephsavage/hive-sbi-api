@@ -1,29 +1,21 @@
 from django.db import models
 
 
-class SBIManager(models.Manager):
-    def __init__(self):
-        super().__init__()
-        self._db = 'sbi'
-
-
-class SBIMember(models.Model):
-    objects = SBIManager()
-
+class Member(models.Model):
     account = models.CharField(
-        primary_key=True,
+        unique=True,
         max_length=50,
     )
 
     note = models.TextField(
+        blank=True,
         null=True,
     )
 
-    shares = models.IntegerField()
+    shares = models.PositiveIntegerField()
+    bonus_shares = models.PositiveIntegerField()
 
-    bonus_shares = models.IntegerField()
-
-    total_share_days = models.IntegerField(
+    total_share_days = models.PositiveIntegerField(
         null=True,
     )
 
@@ -48,30 +40,31 @@ class SBIMember(models.Model):
     )
 
     flags = models.TextField(
+        blank=True,
         null=True,
     )
 
-    earned_rshares = models.BigIntegerField(
+    earned_rshares = models.PositiveBigIntegerField(
         null=True,
     )
 
-    subscribed_rshares = models.BigIntegerField(
+    subscribed_rshares = models.PositiveBigIntegerField(
         default=0,
     )
 
-    curation_rshares = models.BigIntegerField(
+    curation_rshares = models.PositiveBigIntegerField(
         default=0,
     )
 
-    delegation_rshares = models.BigIntegerField(
+    delegation_rshares = models.PositiveBigIntegerField(
         default=0,
     )
 
-    other_rshares = models.BigIntegerField(
+    other_rshares = models.PositiveBigIntegerField(
         default=0,
     )
 
-    rewarded_rshares = models.BigIntegerField(
+    rewarded_rshares = models.PositiveBigIntegerField(
         null=True,
     )
 
@@ -94,17 +87,12 @@ class SBIMember(models.Model):
         null=True,
     )
 
-    hivewatchers = models.BooleanField(
-        null=True,
-    )
-    buildawhale = models.BooleanField(
-        null=True,
-    )
+    hivewatchers = models.BooleanField()
+    buildawhale = models.BooleanField()
 
     def __str__(self):
         return self.account
 
     class Meta:
-        managed = False
-        db_table = 'member'
-
+        verbose_name = 'member'
+        verbose_name_plural = 'members'
