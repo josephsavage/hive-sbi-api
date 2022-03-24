@@ -3,7 +3,9 @@ from .base import *
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = False
 
-ALLOWED_HOSTS = ['*'] 
+ALLOWED_HOSTS = ['api.hivesbi.com']
+
+CSRF_TRUSTED_ORIGINS = ['https://api.hivesbi.com',]
 
 LOGGING = {
     'version': 1,
