@@ -65,9 +65,6 @@ class Configuration(models.Model):
         verbose_name_plural = 'configuration'
 
 
-SBI_CONF = Configuration.objects.first()
-
-
 class Member(models.Model):
     account = models.CharField(
         unique=True,
@@ -159,15 +156,18 @@ class Member(models.Model):
 
     @property
     def pending_balance(self):
-        return self.balance_rshares / SBI_CONF.minimum_vote_threshold * 0.02
+        sbi_conf = Configuration.objects.first()
+        return self.balance_rshares / sbi_conf.minimum_vote_threshold * 0.02
 
     @property
     def next_upvote_estimate(self):
-        return self.pending_balance / SBI_CONF.comment_vote_divider
+        sbi_conf = Configuration.objects.first()
+        return self.pending_balance / sbi_conf.comment_vote_divider
 
     @property
     def estimate_rewarded(self):
-     return self.rewarded_rshares / SBI_CONF.minimum_vote_threshold * 0.02
+        sbi_conf = Configuration.objects.first()
+        return self.rewarded_rshares / sbi_conf.minimum_vote_threshold * 0.02
 
 
     @property
