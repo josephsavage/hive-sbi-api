@@ -30,62 +30,62 @@ def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
         crontab(hour=18, minute=0),
         sync_members.s(),
-        name='sync members',
+        name='sync members_18',
     )
 
     sender.add_periodic_task(
         crontab(hour=20, minute=24),
         sync_members.s(),
-        name='sync members',
+        name='sync members_20',
     )
 
     sender.add_periodic_task(
         crontab(hour=22, minute=48),
         sync_members.s(),
-        name='sync members',
+        name='sync members_22',
     )
 
     sender.add_periodic_task(
         crontab(hour=1, minute=12),
         sync_members.s(),
-        name='sync members',
+        name='sync members_1',
     )
 
     sender.add_periodic_task(
         crontab(hour=3, minute=36),
         sync_members.s(),
-        name='sync members',
+        name='sync members_3',
     )
 
     sender.add_periodic_task(
         crontab(hour=6, minute=0),
         sync_members.s(),
-        name='sync members',
+        name='sync members_6',
     )
 
     sender.add_periodic_task(
         crontab(hour=8, minute=24),
         sync_members.s(),
-        name='sync members',
+        name='sync members_8',
     )
 
 
     sender.add_periodic_task(
         crontab(hour=10, minute=48),
         sync_members.s(),
-        name='sync members',
+        name='sync members_10',
     )
 
     sender.add_periodic_task(
         crontab(hour=13, minute=12),
         sync_members.s(),
-        name='sync members',
+        name='sync members_13',
     )
 
     sender.add_periodic_task(
         crontab(hour=15, minute=25),
         sync_members.s(),
-        name='sync members',
+        name='sync members_15',
     )
 
     sender.add_periodic_task(
