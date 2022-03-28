@@ -216,6 +216,7 @@ def sync_members(self):
             'delegation_rshares',
             'other_rshares',
             'rewarded_rshares',
+            'estimate_rewarded',
             'balance_rshares',
             'upvote_delay',
             'updated_at',
