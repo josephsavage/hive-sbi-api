@@ -28,7 +28,62 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour="18,20,22,1,3,6,8,10,13,15", minute="0,24,48,12,36,0,24,48,12,25"),
+        crontab(hour=18, minute=0),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=20, minute=24),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=22, minute=48),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=1, minute=12),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=3, minute=36),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=6, minute=0),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=8, minute=24),
+        sync_members.s(),
+        name='sync members',
+    )
+
+
+    sender.add_periodic_task(
+        crontab(hour=10, minute=48),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=13, minute=12),
+        sync_members.s(),
+        name='sync members',
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=15, minute=25),
         sync_members.s(),
         name='sync members',
     )
