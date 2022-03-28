@@ -28,7 +28,7 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        timedelta(minutes=144).seconds,
+        crontab(hour="18,20,22,1,3,6,8,10,13,15", minute="0,24,48,12,36,0,24,48,12,25"),
         sync_members.s(),
         name='sync members',
     )
