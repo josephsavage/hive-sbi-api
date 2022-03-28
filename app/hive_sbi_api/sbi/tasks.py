@@ -83,7 +83,7 @@ def setup_periodic_tasks(sender, **kwargs):
     )
 
     sender.add_periodic_task(
-        crontab(hour=15, minute=25),
+        crontab(hour=15, minute=36),
         sync_members.s(),
         name='sync members_15',
     )
