@@ -132,6 +132,10 @@ class Member(models.Model):
         null=True,
     )
 
+    estimate_rewarded = models.FloatField(
+        default=0,
+    )
+
     balance_rshares =  models.BigIntegerField(
         null=True,
     )
@@ -163,12 +167,6 @@ class Member(models.Model):
     def next_upvote_estimate(self):
         sbi_conf = Configuration.objects.first()
         return self.pending_balance / sbi_conf.comment_vote_divider
-
-    @property
-    def estimate_rewarded(self):
-        sbi_conf = Configuration.objects.first()
-        return self.rewarded_rshares / sbi_conf.minimum_vote_threshold * 0.02
-
 
     @property
     def skiplist(self):

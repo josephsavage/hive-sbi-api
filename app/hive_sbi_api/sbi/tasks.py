@@ -52,6 +52,7 @@ def sync_conf():
 @app.task(bind=True)
 def sync_members(self):
     sync_conf()
+    sbi_conf = Configuration.objects.first()
 
     SBImembers = SBIMember.objects.all()
 
@@ -80,8 +81,10 @@ def sync_members(self):
 
         rewarded_rshares = sbi_member.rewarded_rshares
 
-        if rewarded_rshares < 0:
+        if rewarded_rshares < 0 or rewarded_rshares is None:
             rewarded_rshares = 0
+
+        estimate_rewarded = rewarded_rshares / sbi_conf.minimum_vote_threshold * 0.02
 
         # Validate boolean fields.
         # hivewatchers and buildawhale. 
@@ -112,6 +115,7 @@ def sync_members(self):
             'delegation_rshares': sbi_member.delegation_rshares,
             'other_rshares': other_rshares,
             'rewarded_rshares': rewarded_rshares,
+            'estimate_rewarded': estimate_rewarded,
             'balance_rshares': sbi_member.balance_rshares,
             'upvote_delay': sbi_member.upvote_delay,
             'updated_at': sbi_member.updated_at,

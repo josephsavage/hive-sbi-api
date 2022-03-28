@@ -24,6 +24,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'delegation_rshares',
             'other_rshares',
             'rewarded_rshares',
+            'estimate_rewarded',
             'balance_rshares',
             'upvote_delay',
             'updated_at',
@@ -36,5 +37,4 @@ class MemberSerializer(serializers.ModelSerializer):
             'skiplist',
             'pending_balance',
             'next_upvote_estimate',
-            'estimate_rewarded',
         ]
