@@ -218,7 +218,7 @@ class Member(models.Model):
 
     @property
     def totalRShares(self):
-        return "PENDING"
+        return self.earned_rshares + self.curation_rshares + self.delegation_rshares + self.other_rshares
 
     @property
     def rewardedRShares(self):

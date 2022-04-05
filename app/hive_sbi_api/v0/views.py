@@ -38,7 +38,7 @@ class UserInfoHiveResponse:
 class StatusResponse:
     def __init__(self, last_updated_time, estimated_minutes_until_next_update, max_sbi_vote):
         self.lastUpdatedTime = last_updated_time
-        self.estimatedMinuestUntilNextUpdate = estimated_minutes_until_next_update
+        self.estimatedMinutesUntilNextUpdate = estimated_minutes_until_next_update
         self.maxSBIVote = max_sbi_vote
 
 
@@ -66,7 +66,10 @@ class UserInfoHiveViewSet(ListModelMixin,
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
 
-        last_sync_task = TaskResult.objects.latest("date_created")
+        last_sync_task = TaskResult.objects.filter(
+            task_name="hive_sbi_api.sbi.tasks.sync_members",
+        ).latest("date_created")
+
         last_updated_time = last_sync_task.date_created
         next_exec_estimated = last_updated_time + timedelta(hours=2, minutes=24)
 

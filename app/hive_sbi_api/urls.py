@@ -38,10 +38,9 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', RedirectView.as_view(url='docs')),
-
     path('docs/', schema_view.with_ui()),
-    path('v0/', include((api_v0, 'v0'), namespace='v0')),
+
+    path('', include((api_v0, 'v0'), namespace='v0')),
     path('v1/', include((api_v1, 'v1'), namespace='v1')),
 ]
 

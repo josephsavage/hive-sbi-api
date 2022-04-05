@@ -30,7 +30,7 @@ class UserInfoHiveSerializer(serializers.ModelSerializer):
 
 class StatusSerializer(serializers.Serializer):
     lastUpdatedTime = serializers.DateTimeField()
-    estimatedMinuestUntilNextUpdate = serializers.IntegerField()
+    estimatedMinutesUntilNextUpdate = serializers.IntegerField()
     maxSBIVote = serializers.FloatField()
 
 
