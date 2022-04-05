@@ -185,10 +185,6 @@ class Member(models.Model):
 
     # OLD API SUPPORT
     @property
-    def _id(self):
-        return "PENDING"
-
-    @property
     def username(self):
         return self.account
 

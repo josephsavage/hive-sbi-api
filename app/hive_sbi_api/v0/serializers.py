@@ -4,11 +4,11 @@ from rest_framework import serializers
 from hive_sbi_api.core.models import Member
 
 
-class UserInfoHiveSerializer(serializers.ModelSerializer):
+class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
+        ref_name = 'V0 - User data'
         fields = [
-            '_id',
             'username',
             'note',
             'shares',
@@ -33,6 +33,9 @@ class StatusSerializer(serializers.Serializer):
     estimatedMinutesUntilNextUpdate = serializers.IntegerField()
     maxSBIVote = serializers.FloatField()
 
+    class Meta:
+        ref_name = 'V0 - Status'
+
 
 class NotFoundSerializer(serializers.Serializer):
     success = serializers.BooleanField()
@@ -42,5 +45,8 @@ class NotFoundSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.Serializer):
     success = serializers.BooleanField()
-    data = UserInfoHiveSerializer(many=False, read_only=True)
+    data = MemberSerializer(many=False, read_only=True)
     status = StatusSerializer(many=False, read_only=True)
+
+    class Meta:
+        ref_name = 'V0 - Response'

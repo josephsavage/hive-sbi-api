@@ -1,8 +1,8 @@
 from rest_framework import routers
-from .views import UserInfoHiveViewSet
+from .views import MemberViewSet
 
 
-router = routers.SimpleRouter(trailing_slash=False)
-router.register(r'getUserInfoHive/?', UserInfoHiveViewSet)
+router = routers.DefaultRouter()
+router.register(r'users', MemberViewSet)
 
 api_v0_urlpatterns = router.urls

@@ -7,6 +7,9 @@ from rest_framework.mixins import (ListModelMixin,
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 from django_celery_results.models import TaskResult
 
 from django.http import Http404
@@ -15,7 +18,7 @@ from hive_sbi_api.core.models import Member
 from .serializers import (UserSerializer,
                           NotFoundSerializer,
                           StatusSerializer,
-                          UserInfoHiveSerializer)
+                          MemberSerializer)
 
 
 logger = logging.getLogger('v0')
@@ -42,27 +45,17 @@ class StatusResponse:
         self.maxSBIVote = max_sbi_vote
 
 
-class UserInfoHiveViewSet(ListModelMixin,
-                          RetrieveModelMixin,
-                          GenericViewSet):
-    queryset = Member.objects.all()
-    serializer_class = UserInfoHiveSerializer
-    swagger_schema = None
+class MemberViewSet(RetrieveModelMixin,
+                    GenericViewSet):
+    lookup_value_regex = '[^/]+'
     lookup_field = 'account'
 
-    def get_retrieve_parameter(self, request):
-        return request.GET.get('user')
+    queryset = Member.objects.all()
+    serializer_class = MemberSerializer
 
-    def get_object(self):
-        queryset = self.filter_queryset(self.get_queryset())
-        user = self.get_retrieve_parameter(self.request)
-        filter_kwargs = {self.lookup_field: user}
+    user_response = openapi.Response('response description', UserSerializer)
 
-        obj = self.queryset.filter(**filter_kwargs).first()
-        self.check_object_permissions(self.request, obj)
-
-        return obj
-
+    @swagger_auto_schema(tags=['V0'], responses={200: user_response})
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
 
@@ -103,9 +96,3 @@ class UserInfoHiveViewSet(ListModelMixin,
         response_serializer = NotFoundSerializer(response)
 
         return Response(response_serializer.data)
-
-    def list(self, request, *args, **kwargs):
-        if self.get_retrieve_parameter(request):
-            return self.retrieve(self, request, *args, **kwargs)
-        else:
-            raise Http404
