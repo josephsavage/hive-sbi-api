@@ -153,6 +153,11 @@ def sync_members(self):
         if buildawhale is None:
             buildawhale = False
 
+        comment_upvote = sbi_member.comment_upvote
+
+        if comment_upvote is None:
+            comment_upvote = False
+
         data_dict = {
             'note': sbi_member.note,
             'shares': sbi_member.shares,
@@ -179,6 +184,7 @@ def sync_members(self):
             'blacklisted': sbi_member.blacklisted,
             'hivewatchers': hivewatchers,
             'buildawhale': buildawhale,
+            'comment_upvote': comment_upvote,
         }
 
         try:
@@ -225,6 +231,7 @@ def sync_members(self):
             'blacklisted',
             'hivewatchers',
             'buildawhale',
+            'comment_upvote',
         ]
     )
 

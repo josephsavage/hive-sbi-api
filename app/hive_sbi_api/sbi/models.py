@@ -101,6 +101,10 @@ class SBIMember(models.Model):
         null=True,
     )
 
+    comment_upvote = models.BooleanField(
+        null=True,
+    )
+
     def __str__(self):
         return self.account
 

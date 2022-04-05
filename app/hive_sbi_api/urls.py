@@ -23,6 +23,7 @@ from django.conf import settings
 from django.conf.urls import include
 from django.views.generic import RedirectView
 
+from hive_sbi_api.v0.router import api_v0_urlpatterns as api_v0
 from hive_sbi_api.v1.router import api_v1_urlpatterns as api_v1
 
 
@@ -40,8 +41,8 @@ urlpatterns = [
     path('', RedirectView.as_view(url='docs')),
 
     path('docs/', schema_view.with_ui()),
-    path('api/', RedirectView.as_view(url='v1')),
-    path('api/v1/', include((api_v1, 'v1'), namespace='v1')),
+    path('v0/', include((api_v0, 'v0'), namespace='v0')),
+    path('v1/', include((api_v1, 'v1'), namespace='v1')),
 ]
 
 if settings.DEBUG:

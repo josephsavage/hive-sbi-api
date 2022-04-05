@@ -7,7 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.filters import OrderingFilter
 
 from hive_sbi_api.core.models import Member
-from .serializers import MemberSerializer 
+from .serializers import MemberSerializer
 
 
 logger = logging.getLogger('v1')

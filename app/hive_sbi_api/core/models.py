@@ -157,6 +157,7 @@ class Member(models.Model):
 
     hivewatchers = models.BooleanField()
     buildawhale = models.BooleanField()
+    comment_upvote = models.BooleanField(default=False)
 
     @property
     def pending_balance(self):
@@ -181,6 +182,67 @@ class Member(models.Model):
                 skiplist = False
 
         return skiplist
+
+    # OLD API SUPPORT
+    @property
+    def _id(self):
+        return "PENDING"
+
+    @property
+    def username(self):
+        return self.account
+
+    @property
+    def bonusShares(self):
+        return self.bonus_shares
+
+    @property
+    def balanceRShares(self):
+        return self.balance_rshares
+
+    @property
+    def subscribedRShares(self):
+        return self.subscribed_rshares
+
+    @property
+    def curationRShares(self):
+        return self.curation_rshares
+
+    @property
+    def delegationRShares(self):
+        return self.delegation_rshares
+
+    @property
+    def otherRShares(self):
+        return self.other_rshares
+
+    @property
+    def totalRShares(self):
+        return "PENDING"
+
+    @property
+    def rewardedRShares(self):
+        return self.rewarded_rshares
+
+    @property
+    def commentUpvote(self):
+        return self.comment_upvote
+
+    @property
+    def estimateBalanceValue(self):
+        return self.pending_balance
+
+    @property
+    def estimatedNextVote(self):
+        return self.next_upvote_estimate
+
+    @property
+    def estimateRewarded(self):
+        return self.estimate_rewarded
+
+    @property
+    def skiplisted(self):
+        return self.skiplist
 
     def __str__(self):
         return self.account
