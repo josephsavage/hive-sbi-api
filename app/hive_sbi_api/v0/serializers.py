@@ -31,7 +31,7 @@ class MemberSerializer(serializers.ModelSerializer):
 class StatusSerializer(serializers.Serializer):
     lastUpdatedTime = serializers.DateTimeField()
     estimatedMinutesUntilNextUpdate = serializers.IntegerField()
-    maxSBIVote = serializers.FloatField()
+    #maxSBIVote = serializers.FloatField()
 
     class Meta:
         ref_name = 'V0 - Status'
