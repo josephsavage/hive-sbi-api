@@ -136,9 +136,13 @@ class Member(models.Model):
         default=0,
     )
 
-    balance_rshares =  models.BigIntegerField(
+    balance_rshares = models.BigIntegerField(
         null=True,
     )
+
+    total_rshares = models.BigIntegerField(
+        null=True,
+    ) 
 
     upvote_delay = models.FloatField(
         null=True,
@@ -214,7 +218,7 @@ class Member(models.Model):
 
     @property
     def totalRShares(self):
-        return self.earned_rshares + self.curation_rshares + self.delegation_rshares + self.other_rshares
+        return self.total_rshares
 
     @property
     def rewardedRShares(self):

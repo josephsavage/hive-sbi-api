@@ -1,4 +1,83 @@
 # hive-sbi-api
-API
 
-Test
+Docker compose  V3.7 deployment
+===============================
+
+### Network
+
+Create a network with the `bridge` driver:
+
+~~~
+$ docker network create --driver bridge sbi-bridge
+~~~
+
+### Set environment variables
+
+Generate a new `.env` file from the provided template:
+
+~~~
+$ cp env.template .env
+~~~
+
+Example of `.env` file:
+
+~~~
+LANG=C.UTF-8
+LC_ALL=C.UTF-8
+
+SECRET_KEY=Secret
+
+POSTGRES_DB=DB
+POSTGRES_USER=USER
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_PASSWORD=XXXpasswordXXX
+
+SBI_DB_NAME=DB
+SBI_DB_USER=USER
+SBI_DB_PASSWORD=XXXpasswordXXX
+SBI_DB_HOST=host-ip
+SBI_DB_PORT=port
+~~~
+
+**Change SECRET_KEY for a long and secure string.**
+
+# DEVELOPMENT ENVIRONMENT
+
+### Build app image
+
+~~~
+$ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.dev.yml build
+~~~
+
+### run service
+
+~~~
+$ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.dev.yml up
+~~~
+
+Application will be exposed on port http://localhost:8009 and through NGINX on port http://localhost:5009.
+
+
+# PRODUCTION ENVIRONMENT
+
+### Build app image
+
+~~~
+$ docker build app -t hive_sbi_api:0.1.0 --build-arg DJANGO_ENV=prod
+~~~
+
+or
+
+~~~
+$ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.prod.yml build
+~~~
+
+### run service
+
+~~~
+$ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.prod.yml up -d
+~~~
+
+Application will be exposed through NGINX on port http://localhost:5009.
+

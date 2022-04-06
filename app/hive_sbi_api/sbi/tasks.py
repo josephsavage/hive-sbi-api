@@ -141,6 +141,8 @@ def sync_members(self):
 
         estimate_rewarded = rewarded_rshares / sbi_conf.minimum_vote_threshold * 0.02
 
+        total_rshares = sbi_member.earned_rshares + curation_rshares + sbi_member.delegation_rshares + other_rshares
+
         # Validate boolean fields.
         # hivewatchers and buildawhale. 
         hivewatchers = sbi_member.hivewatchers
@@ -177,6 +179,7 @@ def sync_members(self):
             'rewarded_rshares': rewarded_rshares,
             'estimate_rewarded': estimate_rewarded,
             'balance_rshares': sbi_member.balance_rshares,
+            'total_rshares': total_rshares,
             'upvote_delay': sbi_member.upvote_delay,
             'updated_at': sbi_member.updated_at,
             'first_cycle_at': sbi_member.first_cycle_at,
@@ -224,6 +227,7 @@ def sync_members(self):
             'rewarded_rshares',
             'estimate_rewarded',
             'balance_rshares',
+            'total_rshares',
             'upvote_delay',
             'updated_at',
             'first_cycle_at',
