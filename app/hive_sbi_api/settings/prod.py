@@ -7,6 +7,8 @@ ALLOWED_HOSTS = ['api.hivesbi.com']
 
 CSRF_TRUSTED_ORIGINS = ['https://api.hivesbi.com',]
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
