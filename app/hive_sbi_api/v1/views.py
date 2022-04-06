@@ -23,4 +23,4 @@ class MemberViewSet(ListModelMixin,
     serializer_class = MemberSerializer
 
     filter_backends = [OrderingFilter]
-    ordering_fields = ['shares', 'bonus_shares', 'estimate_rewarded']
+    ordering_fields = ['shares', 'bonus_shares', 'estimate_rewarded', 'total_rshares']
