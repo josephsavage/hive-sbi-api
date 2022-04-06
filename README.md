@@ -89,7 +89,9 @@ It is a background task that runs every 2.4 hours and is in charge of synchroniz
 To perform this task, three components have been deployed, each one in a Docker container:
 
 **Redis DB**: To host tasks queue.
+
 **Celery Worker**: To run batch jobs in the background.
+
 **Celery Beat**: To keep track of when tasks should be executed. Manages the tasks schedule. 
 
 The synchronization function, named `sync_members`, is defnined in the [tasks.py](hive_sbi_api/sbi/tasks.py) file in the `sbi` app.
