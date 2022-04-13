@@ -36,7 +36,7 @@ class StatusSerializer(serializers.Serializer):
     Line 41 comment #maxSBIVote: pending definition of value source.
     Value must be provided in the file app/hive_sbi_api/v0/views.py
     on line 74. when the value is obtained, remove
-    this comment and uncomment the line next line (41).
+    this comment and uncomment the next line (41).
     """
     #maxSBIVote = serializers.FloatField()
 
