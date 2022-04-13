@@ -40,9 +40,9 @@ class UserInfoHiveResponse:
 
 class StatusResponse:
     def __init__(self, last_updated_time, estimated_minutes_until_next_update, max_sbi_vote):
-        self.last_updated_time = last_updated_time
-        self.estimated_minutes_until_next_update = estimated_minutes_until_next_update
-        self.max_sbi_vote = max_sbi_vote
+        self.lastUpdatedTime = last_updated_time
+        self.estimatedMinutesUntilNextUpdate = estimated_minutes_until_next_update
+        self.maxSBIVote = max_sbi_vote
 
 
 class MemberViewSet(RetrieveModelMixin,

@@ -29,11 +29,9 @@ class MemberSerializer(serializers.ModelSerializer):
 
 
 class StatusSerializer(serializers.Serializer):
-    last_updated_time = serializers.DateTimeField(label="lastUpdatedTime")
-    estimated_minutes_until_next_update = serializers.IntegerField(
-        label="estimatedMinutesUntilNextUpdate"
-    )
-    #max_sbi_vote = serializers.FloatField(label="maxSBIVote")
+    lastUpdatedTime = serializers.DateTimeField()
+    estimatedMinutesUntilNextUpdate = serializers.IntegerField()
+    #maxSBIVote = serializers.FloatField()
 
     class Meta:
         ref_name = 'V0 - Status'
