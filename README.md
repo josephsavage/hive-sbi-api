@@ -95,3 +95,8 @@ To perform this task, three components have been deployed, each one in a Docker 
 **Celery Beat**: To keep track of when tasks should be executed. Manages the tasks schedule. 
 
 The synchronization function, named `sync_members`, is defnined in the [tasks.py](app/hive_sbi_api/sbi/tasks.py) file in the `sbi` app.
+
+
+# API docs
+
+API documentation is generated with Swagger and is available in https://api.hivesbi.com/docs/.

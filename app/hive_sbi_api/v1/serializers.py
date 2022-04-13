@@ -34,7 +34,6 @@ class MemberSerializer(serializers.ModelSerializer):
             'blacklisted',
             'hivewatchers',
             'buildawhale',
-            # Properties 
             'skiplist',
             'pending_balance',
             'next_upvote_estimate',
