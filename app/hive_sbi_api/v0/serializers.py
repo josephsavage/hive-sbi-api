@@ -24,6 +24,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'estimateBalanceValue',
             'estimatedNextVote',
             'estimateRewarded',
+            'blacklisted',
             'skiplisted',
         ]
 
