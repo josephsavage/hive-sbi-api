@@ -141,7 +141,7 @@ def sync_members(self):
 
         estimate_rewarded = rewarded_rshares / sbi_conf.minimum_vote_threshold * 0.02
 
-        total_rshares = sbi_member.earned_rshares + curation_rshares + sbi_member.delegation_rshares + other_rshares
+        total_rshares = rewarded_rshares + sbi_member.balance_rshares
 
         # Validate boolean fields.
         # hivewatchers and buildawhale. 
