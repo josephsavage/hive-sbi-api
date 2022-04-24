@@ -250,3 +250,4 @@ class Member(models.Model):
     class Meta:
         verbose_name = 'member'
         verbose_name_plural = 'members'
+        ordering  = ['account']
