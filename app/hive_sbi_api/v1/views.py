@@ -25,6 +25,7 @@ class MemberViewSet(ListModelMixin,
 
     filter_backends = [OrderingFilter]
     ordering_fields = [
+        'total_shares',
         'shares',
         'bonus_shares',
         'estimate_rewarded',

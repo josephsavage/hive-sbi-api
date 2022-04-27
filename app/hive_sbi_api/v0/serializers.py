@@ -13,6 +13,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'note',
             'shares',
             'bonusShares',
+            'totalShares',
             'balanceRShares',
             'subscribedRShares',
             'curationRShares',

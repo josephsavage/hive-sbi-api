@@ -79,6 +79,10 @@ class Member(models.Model):
     shares = models.PositiveIntegerField()
     bonus_shares = models.PositiveIntegerField()
 
+    total_shares = models.PositiveBigIntegerField(
+        default=0,
+    )
+
     total_share_days = models.PositiveIntegerField(
         null=True,
     )
@@ -195,6 +199,10 @@ class Member(models.Model):
         return self.bonus_shares
 
     @property
+    def totalShares(self):
+        return self.total_shares
+
+    @property
     def balanceRShares(self):
         return self.balance_rshares
 
@@ -248,4 +256,4 @@ class Member(models.Model):
     class Meta:
         verbose_name = 'member'
         verbose_name_plural = 'members'
-        ordering  = ['account']
+        ordering  = ['-total_shares']

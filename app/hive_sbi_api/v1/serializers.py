@@ -11,6 +11,7 @@ class MemberSerializer(serializers.ModelSerializer):
             'note',
             'shares',
             'bonus_shares',
+            'total_shares',
             'total_share_days',
             'avg_share_age',
             'last_comment',
