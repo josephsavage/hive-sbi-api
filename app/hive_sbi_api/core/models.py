@@ -132,7 +132,15 @@ class Member(models.Model):
         null=True,
     )
 
+    pending_balance = models.FloatField(
+        default=0,
+    )
+
     estimate_rewarded = models.FloatField(
+        default=0,
+    )
+
+    next_upvote_estimate = models.FloatField(
         default=0,
     )
 
@@ -162,16 +170,6 @@ class Member(models.Model):
     hivewatchers = models.BooleanField()
     buildawhale = models.BooleanField()
     comment_upvote = models.BooleanField(default=False)
-
-    @property
-    def pending_balance(self):
-        sbi_conf = Configuration.objects.first()
-        return self.balance_rshares / sbi_conf.minimum_vote_threshold * 0.02
-
-    @property
-    def next_upvote_estimate(self):
-        sbi_conf = Configuration.objects.first()
-        return self.pending_balance / sbi_conf.comment_vote_divider
 
     @property
     def skiplist(self):

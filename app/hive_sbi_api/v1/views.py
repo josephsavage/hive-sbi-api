@@ -24,7 +24,13 @@ class MemberViewSet(ListModelMixin,
     serializer_class = MemberSerializer
 
     filter_backends = [OrderingFilter]
-    ordering_fields = ['shares', 'bonus_shares', 'estimate_rewarded', 'total_rshares']
+    ordering_fields = [
+        'shares',
+        'bonus_shares',
+        'estimate_rewarded',
+        'pending_balance',
+        'next_upvote_estimate',
+        'total_rshares',]
 
     def get_object(self):
         """

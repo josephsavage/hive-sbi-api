@@ -139,6 +139,8 @@ def sync_members(self):
         if rewarded_rshares < 0 or rewarded_rshares is None:
             rewarded_rshares = 0
 
+        pending_balance = sbi_member.balance_rshares / sbi_conf.minimum_vote_threshold * 0.02
+        next_upvote_estimate = pending_balance / sbi_conf.comment_vote_divider
         estimate_rewarded = rewarded_rshares / sbi_conf.minimum_vote_threshold * 0.02
 
         total_rshares = rewarded_rshares + sbi_member.balance_rshares
@@ -177,6 +179,8 @@ def sync_members(self):
             'delegation_rshares': sbi_member.delegation_rshares,
             'other_rshares': other_rshares,
             'rewarded_rshares': rewarded_rshares,
+            'pending_balance': pending_balance,
+            'next_upvote_estimate': next_upvote_estimate,
             'estimate_rewarded': estimate_rewarded,
             'balance_rshares': sbi_member.balance_rshares,
             'total_rshares': total_rshares,
@@ -225,6 +229,8 @@ def sync_members(self):
             'delegation_rshares',
             'other_rshares',
             'rewarded_rshares',
+            'pending_balance',
+            'next_upvote_estimate',
             'estimate_rewarded',
             'balance_rshares',
             'total_rshares',
