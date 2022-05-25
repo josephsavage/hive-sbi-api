@@ -165,3 +165,58 @@ class SBIConfiguration(models.Model):
     class Meta:
         managed = False
         db_table = 'configuration'
+
+
+class SBITransaction(models.Model):
+    objects = SBIManager()
+
+    index = models.BigIntegerField(primary_key=True,)
+
+    source = models.CharField(
+        max_length=50,
+    )
+
+    memo = models.TextField(
+        blank=True,
+        null=True,
+    ) 
+
+    account = models.CharField(
+        null=True,
+        max_length=50,
+    )
+
+    sponsor = models.CharField(
+        null=True,
+        max_length=50,
+    )
+
+    sponsee = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    shares = models.IntegerField(
+        null=True,
+    )
+
+    vests = models.FloatField(
+        null=True,
+    )
+
+    timestamp = models.DateTimeField()
+
+    status = models.CharField(
+        max_length=50,
+    )
+
+    share_type = models.CharField(
+        max_length=50,
+    )
+
+    def __str__(self):
+        return "{}".format(self.index)
+
+    class Meta:
+        managed = False
+        db_table = 'trx'

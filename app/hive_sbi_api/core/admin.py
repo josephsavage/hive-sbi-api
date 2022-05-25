@@ -1,7 +1,9 @@
 from django.contrib import admin
 
 from .models import (Member,
-                     Configuration)
+                     Configuration,
+                     Transaction,
+                     FailedTransactionSponsee)
 
 
 @admin.register(Member)
@@ -50,4 +52,39 @@ class ConfigurationAdmin(admin.ModelAdmin):
         'minimum_vote_threshold',
         'last_delegation_check',
         'comment_footer',
+    )
+
+@admin.register(Transaction)
+class TransactionAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    list_display = (
+        'index',
+        'source',
+        'account',
+        'sponsor',
+        'shares',
+        'status',
+        'share_type',
+        'timestamp',
+    )
+
+
+@admin.register(FailedTransactionSponsee)
+class FailedTransactionSponseeAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    list_display = (
+        'id',
+        'transaction',
+        'spoonse_text',
+        'is_solved',
     )

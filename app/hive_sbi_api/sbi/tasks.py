@@ -1,3 +1,4 @@
+import json
 import logging
 import requests
 
@@ -14,16 +15,19 @@ from django.db.utils import IntegrityError
 from django.forms.models import model_to_dict
 
 from hive_sbi_api.sbi.models import (SBIMember,
-                                     SBIConfiguration)
+                                     SBIConfiguration,
+                                     SBITransaction)
 from hive_sbi_api.core.models import (Member,
-                                      Configuration)
+                                      Configuration,
+                                      Transaction,
+                                      Sponsee,
+                                      FailedTransactionSponsee)
 
 
 
 logger = logging.getLogger('sbi')
 
 app = current_app._get_current_object()
-
 
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
@@ -95,6 +99,64 @@ def setup_periodic_tasks(sender, **kwargs):
     )
 
 
+@app.task(bind=True)
+def sync_trx(self):
+    pending_transactions = SBITransaction.objects.all()
+
+    if Transaction.objects.count():
+        pending_transactions = SBITransaction.objects.filter(
+            timestamp__gt=Transaction.objects.latest("timestamp").timestamp
+        )
+
+    created_transactions = 0
+    failed_transactions = 0
+
+    for pending_trx in pending_transactions:
+        account = Member.objects.filter(account=pending_trx.account).first()
+        sponsor = Member.objects.filter(account=pending_trx.sponsor).first()
+
+        if account and sponsor: 
+            trx = Transaction.objects.create(
+                index=pending_trx.index,
+                source=pending_trx.source,
+                memo=pending_trx.memo,
+                account=Member.objects.get(account=pending_trx.account),
+                sponsor=Member.objects.get(account=pending_trx.sponsor),
+                shares=pending_trx.shares,
+                vests=pending_trx.vests,
+                timestamp=pending_trx.timestamp,
+                status=pending_trx.status,
+                share_type=pending_trx.share_type,
+            )  
+
+            created_transactions += 1 
+
+            if pending_trx.sponsee:
+                sponsee = pending_trx.sponsee
+
+                try:
+                    sponsee_dict = json.loads(sponsee)
+
+                    for account, units in sponsee_dict.items():
+                        if Member.objects.filter(account=account):
+                            trx.sponsees.create(
+                                account=Member.objects.filter(account=account).first(),
+                                units=units,
+                            )
+                except json.decoder.JSONDecodeError:
+                    FailedTransactionSponsee.objects.create(
+                        transaction=trx,
+                        spoonse_text=sponsee,
+                    )
+
+                    failed_transactions += 1
+
+    return "Created {} transactions. Failed {} transactions soopnse".format(
+        created_transactions,
+        failed_transactions,
+    )
+
+
 def sync_conf():
     sbi_conf = SBIConfiguration.objects.first()
     conf = Configuration.objects.first()
@@ -107,6 +169,8 @@ def sync_conf():
 @app.task(bind=True)
 def sync_members(self):
     sync_conf()
+    sync_trx.delay()
+
     sbi_conf = Configuration.objects.first()
 
     SBImembers = SBIMember.objects.all()

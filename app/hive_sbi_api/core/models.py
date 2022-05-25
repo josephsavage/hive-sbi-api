@@ -1,6 +1,11 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
+from .data import (TRX_SOURCE_CHOICES,
+                   TRX_STATUS_CHOICES,
+                   TRX_SHARE_TYPE_CHOICES)
 
+ 
 class Configuration(models.Model):
     share_cycle_min = models.FloatField(
         default=144,
@@ -257,3 +262,110 @@ class Member(models.Model):
         verbose_name = 'member'
         verbose_name_plural = 'members'
         ordering  = ['-total_shares']
+
+
+class Sponsee(models.Model):
+    account = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        verbose_name=_('account'),
+    )
+
+    units = models.IntegerField()
+
+    def __str__(self):
+        return "{} - {}".format(
+            self.account,
+            self.units,
+        )
+
+    class Meta:
+        verbose_name = 'sponsee'
+        verbose_name_plural = 'sponsees'
+        ordering  = ['account']
+
+
+class Transaction(models.Model):
+    index = models.BigIntegerField()
+
+    source = models.CharField(
+        choices=TRX_SOURCE_CHOICES,
+        max_length=50,
+    )
+
+    memo = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    account = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        verbose_name=_('account'),
+    )
+
+    sponsor = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        verbose_name=_('sponsor'),
+        related_name='sponsor',
+    )
+
+    sponsees = models.ManyToManyField(
+        Sponsee,
+        blank=True,
+        verbose_name=_('crops'),
+    )
+
+    shares = models.IntegerField(
+        null=True,
+    )
+
+    vests = models.FloatField(
+        null=True,
+    )
+
+    timestamp = models.DateTimeField()
+
+    status = models.CharField(
+        choices=TRX_STATUS_CHOICES,
+        max_length=50,
+    )
+
+    share_type = models.CharField(
+        choices=TRX_SHARE_TYPE_CHOICES,
+        max_length=50,
+    )
+
+    def __str__(self):
+        return "{}".format(self.index)
+
+    class Meta:
+        verbose_name = 'transaction'
+        verbose_name_plural = 'transactions'
+        ordering  = ['-timestamp']
+
+
+class FailedTransactionSponsee(models.Model):
+    transaction = models.ForeignKey(
+        Transaction,
+        on_delete=models.CASCADE,
+        verbose_name=_('transaction'),
+    )
+
+    spoonse_text = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    is_solved = models.BooleanField(
+        default=False,
+    )
+
+    def __str__(self):
+        return "{}".format(self.transaction)
+
+    class Meta:
+        verbose_name = 'failed transaction soopnse'
+        verbose_name_plural = 'failed transactions soopnse'
+        ordering  = ['-transaction']
