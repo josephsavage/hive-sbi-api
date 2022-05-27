@@ -7,8 +7,10 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import get_object_or_404
 
-from hive_sbi_api.core.models import Member
-from .serializers import MemberSerializer
+from hive_sbi_api.core.models import (Member,
+                                      Transaction)
+from .serializers import (MemberSerializer,
+                          TransactionSerializer)
 
 
 logger = logging.getLogger('v1')
@@ -60,3 +62,10 @@ class MemberViewSet(ListModelMixin,
         self.check_object_permissions(self.request, obj)
 
         return obj
+
+
+class TransactionViewSet(ListModelMixin,
+                         GenericViewSet):
+
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer

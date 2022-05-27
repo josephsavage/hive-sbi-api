@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from hive_sbi_api.core.models import Member
+from hive_sbi_api.core.models import (Member,
+                                      Transaction)
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -38,4 +39,22 @@ class MemberSerializer(serializers.ModelSerializer):
             'skiplist',
             'pending_balance',
             'next_upvote_estimate',
+        ]
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [
+            'index',
+            'source',
+            'memo',
+            'account',
+            'sponsor',
+            'sponsees',
+            'shares',
+            'vests',
+            'timestamp',
+            'status',
+            'share_type',
         ]
