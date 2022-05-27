@@ -139,10 +139,12 @@ def sync_trx(self):
 
                     for account, units in sponsee_dict.items():
                         if Member.objects.filter(account=account):
-                            trx.sponsees.create(
+                            Sponsee.objects.create(
+                                trx=trx,
                                 account=Member.objects.filter(account=account).first(),
                                 units=units,
                             )
+
                 except json.decoder.JSONDecodeError:
                     FailedTransactionSponsee.objects.create(
                         transaction=trx,

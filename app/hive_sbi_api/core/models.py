@@ -264,27 +264,6 @@ class Member(models.Model):
         ordering  = ['-total_shares']
 
 
-class Sponsee(models.Model):
-    account = models.ForeignKey(
-        Member,
-        on_delete=models.CASCADE,
-        verbose_name=_('account'),
-    )
-
-    units = models.IntegerField()
-
-    def __str__(self):
-        return "{} - {}".format(
-            self.account,
-            self.units,
-        )
-
-    class Meta:
-        verbose_name = 'sponsee'
-        verbose_name_plural = 'sponsees'
-        ordering  = ['account']
-
-
 class Transaction(models.Model):
     index = models.BigIntegerField()
 
@@ -309,12 +288,6 @@ class Transaction(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_('sponsor'),
         related_name='sponsor',
-    )
-
-    sponsees = models.ManyToManyField(
-        Sponsee,
-        blank=True,
-        verbose_name=_('crops'),
     )
 
     shares = models.IntegerField(
@@ -343,7 +316,35 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = 'transaction'
         verbose_name_plural = 'transactions'
-        ordering  = ['-timestamp']
+        ordering = ['-timestamp']
+
+
+class Sponsee(models.Model):
+    trx = models.ForeignKey(
+        Transaction,
+        on_delete=models.CASCADE,
+        related_name='sponsees',
+        verbose_name=_('trx'),
+    )
+
+    account = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        verbose_name=_('account'),
+    )
+
+    units = models.IntegerField()
+
+    def __str__(self):
+        return "{} - {}".format(
+            self.account,
+            self.units,
+        )
+
+    class Meta:
+        verbose_name = 'sponsee'
+        verbose_name_plural = 'sponsees'
+        ordering  = ['account']
 
 
 class FailedTransactionSponsee(models.Model):

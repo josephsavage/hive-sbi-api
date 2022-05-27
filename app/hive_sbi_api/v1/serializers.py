@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from hive_sbi_api.core.models import (Member,
-                                      Transaction)
+                                      Transaction,
+                                      Sponsee)
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -42,7 +43,22 @@ class MemberSerializer(serializers.ModelSerializer):
         ]
 
 
+class SponseeSerializer(serializers.ModelSerializer):
+    account = serializers.CharField(source='account.account')
+    class Meta:
+        model = Sponsee
+        fields = [
+            'account',
+            'units',
+        ]
+
+
 class TransactionSerializer(serializers.ModelSerializer):
+    account = serializers.CharField(source='account.account')
+    sponsor = serializers.CharField(source='sponsor.account')
+
+    sponsees = SponseeSerializer(many=True, read_only=True)
+
     class Meta:
         model = Transaction
         fields = [
