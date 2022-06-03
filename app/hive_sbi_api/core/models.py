@@ -353,15 +353,15 @@ class Sponsee(models.Model):
 class FailedTransaction(models.Model):
     trx_index = models.BigIntegerField()
 
+    fail_type = models.PositiveSmallIntegerField(
+        choices=FAILED_TRX_TYPE_CHOICES,
+    )
+
     transaction = models.ForeignKey(
         Transaction,
         null=True,
         on_delete=models.CASCADE,
         verbose_name=_('transaction'),
-    )
-
-    fail_type = models.PositiveSmallIntegerField(
-        choices=FAILED_TRX_TYPE_CHOICES,
     )
 
     description = models.TextField(
