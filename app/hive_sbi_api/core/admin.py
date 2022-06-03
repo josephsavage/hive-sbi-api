@@ -3,7 +3,8 @@ from django.contrib import admin
 from .models import (Member,
                      Configuration,
                      Transaction,
-                     FailedTransactionSponsee)
+                     Sponsee,
+                     FailedTransaction)
 
 
 @admin.register(Member)
@@ -54,13 +55,21 @@ class ConfigurationAdmin(admin.ModelAdmin):
         'comment_footer',
     )
 
+
+class SponseeInline(admin.TabularInline):
+    model = Sponsee
+    verbose_name_plural = 'sponsees'
+
+
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request, obj=None):
-        return False
+    inlines = (SponseeInline,)
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#    def has_add_permission(self, request, obj=None):
+#        return False
+
+#    def has_delete_permission(self, request, obj=None):
+#        return False
 
     list_display = (
         'index',
@@ -74,8 +83,8 @@ class TransactionAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(FailedTransactionSponsee)
-class FailedTransactionSponseeAdmin(admin.ModelAdmin):
+@admin.register(FailedTransaction)
+class FailedTransactionAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
 
@@ -84,7 +93,14 @@ class FailedTransactionSponseeAdmin(admin.ModelAdmin):
 
     list_display = (
         'id',
+        'fail_type',
+        'trx_index',
         'transaction',
         'spoonse_text',
         'is_solved',
     )
+
+    list_filter = [
+        'fail_type',
+        'is_solved',
+    ]

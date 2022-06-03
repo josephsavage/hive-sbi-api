@@ -21,8 +21,14 @@ from hive_sbi_api.core.models import (Member,
                                       Configuration,
                                       Transaction,
                                       Sponsee,
-                                      FailedTransactionSponsee)
+                                      FailedTransaction)
 
+from hive_sbi_api.core.data import (FAILED_TRX_TYPE_NO_ACCOUNT,
+                                    FAILED_TRX_TYPE_NO_SPONSOR,
+                                    FAILED_TRX_TYPE_EMPTY_SPONSEE,
+                                    FAILED_TRX_TYPE_NO_SPONSEE_ACCOUNT,
+                                    FAILED_TRX_TYPE_BAD_SPONSEE_FORMAT,
+                                    FAILED_TRX_TYPE_INDEX_ALREADY_EXISTS)
 
 
 logger = logging.getLogger('sbi')
@@ -112,16 +118,51 @@ def sync_trx(self):
     failed_transactions = 0
 
     for pending_trx in pending_transactions:
-        account = Member.objects.filter(account=pending_trx.account).first()
-        sponsor = Member.objects.filter(account=pending_trx.sponsor).first()
+        index = pending_trx.index
+        trx = None
+        account = None
+        sponsor = None
+        sponsee = pending_trx.sponsee
 
-        if account and sponsor: 
+        try:
+            account = Member.objects.get(account=pending_trx.account)
+
+        except Member.DoesNotExist as e:            
+            FailedTransaction.objects.create(
+                transaction=trx,
+                trx_index=index,
+                fail_type=FAILED_TRX_TYPE_NO_ACCOUNT,
+                description="{}".format(e),
+                spoonse_text=sponsee,
+            )
+
+            failed_transactions += 1
+
+            continue
+
+        try:
+            sponsor = Member.objects.get(account=pending_trx.sponsor)
+
+        except Member.DoesNotExist as e:            
+            FailedTransaction.objects.create(
+                transaction=trx,
+                trx_index=index,
+                fail_type=FAILED_TRX_TYPE_NO_SPONSOR,
+                description="{}".format(e),
+                spoonse_text=sponsee,
+            )
+
+            failed_transactions += 1
+
+            continue
+
+        try:
             trx = Transaction.objects.create(
-                index=pending_trx.index,
+                index=index,
                 source=pending_trx.source,
                 memo=pending_trx.memo,
-                account=Member.objects.get(account=pending_trx.account),
-                sponsor=Member.objects.get(account=pending_trx.sponsor),
+                account=account,
+                sponsor=sponsor,
                 shares=pending_trx.shares,
                 vests=pending_trx.vests,
                 timestamp=pending_trx.timestamp,
@@ -129,29 +170,67 @@ def sync_trx(self):
                 share_type=pending_trx.share_type,
             )  
 
-            created_transactions += 1 
+            created_transactions += 1
 
-            if pending_trx.sponsee:
-                sponsee = pending_trx.sponsee
+        except IntegrityError as e:
+            FailedTransaction.objects.create(
+                trx_index=index,
+                transaction=trx,
+                fail_type=FAILED_TRX_TYPE_INDEX_ALREADY_EXISTS,
+                description="{}".format(e),
+                spoonse_text=sponsee,
+            )
 
-                try:
-                    sponsee_dict = json.loads(sponsee)
+            failed_transactions += 1
 
-                    for account, units in sponsee_dict.items():
-                        if Member.objects.filter(account=account):
-                            Sponsee.objects.create(
-                                trx=trx,
-                                account=Member.objects.filter(account=account).first(),
-                                units=units,
-                            )
+            continue
 
-                except json.decoder.JSONDecodeError:
-                    FailedTransactionSponsee.objects.create(
-                        transaction=trx,
-                        spoonse_text=sponsee,
-                    )
+        if sponsee:
+            try:
+                sponsee_dict = json.loads(sponsee)
 
-                    failed_transactions += 1
+                for account, units in sponsee_dict.items():
+                    if Member.objects.filter(account=account):
+                        Sponsee.objects.create(
+                            trx=trx,
+                            account=Member.objects.filter(account=account).first(),
+                            units=units,
+                        )
+
+                    else:
+                        FailedTransaction.objects.create(
+                            trx_index=index,
+                            transaction=trx,
+                            fail_type=FAILED_TRX_TYPE_NO_SPONSEE_ACCOUNT,
+                            description="Spoonse account does not exist",
+                            spoonse_text=sponsee,
+                        )
+
+                        failed_transactions += 1
+
+            except json.decoder.JSONDecodeError as e:
+                FailedTransaction.objects.create(
+                    trx_index=index,
+                    transaction=trx,
+                    fail_type=FAILED_TRX_TYPE_BAD_SPONSEE_FORMAT,
+                    description="{}".format(e),
+                    spoonse_text=sponsee,
+                )
+
+                failed_transactions += 1
+        else:
+            FailedTransaction.objects.create(
+                trx_index=index,
+                transaction=trx,
+                fail_type=FAILED_TRX_TYPE_EMPTY_SPONSEE,
+                description="No sponsee info",
+                spoonse_text=sponsee,
+            )
+
+            failed_transactions += 1
+
+            continue
+
 
     return "Created {} transactions. Failed {} transactions soopnse".format(
         created_transactions,

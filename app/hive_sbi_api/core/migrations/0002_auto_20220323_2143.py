@@ -8,7 +8,6 @@ from django.db import migrations
 logger = logging.getLogger('v1')
 
 
-
 def create_configuration(apps, schema_editor):
     Configuration = apps.get_model('core', 'Configuration')
     

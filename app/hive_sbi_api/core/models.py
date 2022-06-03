@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from .data import (TRX_SOURCE_CHOICES,
                    TRX_STATUS_CHOICES,
-                   TRX_SHARE_TYPE_CHOICES)
+                   TRX_SHARE_TYPE_CHOICES,
+                   FAILED_TRX_TYPE_CHOICES)
 
  
 class Configuration(models.Model):
@@ -265,7 +266,9 @@ class Member(models.Model):
 
 
 class Transaction(models.Model):
-    index = models.BigIntegerField()
+    index = models.BigIntegerField(
+        primary_key=True,
+    )
 
     source = models.CharField(
         choices=TRX_SOURCE_CHOICES,
@@ -347,11 +350,23 @@ class Sponsee(models.Model):
         ordering  = ['account']
 
 
-class FailedTransactionSponsee(models.Model):
+class FailedTransaction(models.Model):
+    trx_index = models.BigIntegerField()
+
     transaction = models.ForeignKey(
         Transaction,
+        null=True,
         on_delete=models.CASCADE,
         verbose_name=_('transaction'),
+    )
+
+    fail_type = models.PositiveSmallIntegerField(
+        choices=FAILED_TRX_TYPE_CHOICES,
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
     )
 
     spoonse_text = models.TextField(
@@ -364,9 +379,9 @@ class FailedTransactionSponsee(models.Model):
     )
 
     def __str__(self):
-        return "{}".format(self.transaction)
+        return "{}".format(self.trx_index)
 
     class Meta:
-        verbose_name = 'failed transaction soopnse'
-        verbose_name_plural = 'failed transactions soopnse'
+        verbose_name = 'failed transaction'
+        verbose_name_plural = 'failed transactions'
         ordering  = ['-transaction']
