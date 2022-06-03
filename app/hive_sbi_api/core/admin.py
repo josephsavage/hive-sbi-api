@@ -59,6 +59,7 @@ class ConfigurationAdmin(admin.ModelAdmin):
 class SponseeInline(admin.TabularInline):
     model = Sponsee
     verbose_name_plural = 'sponsees'
+    extra = 0
 
 
 @admin.register(Transaction)
@@ -85,11 +86,11 @@ class TransactionAdmin(admin.ModelAdmin):
 
 @admin.register(FailedTransaction)
 class FailedTransactionAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request, obj=None):
-        return False
+#    def has_add_permission(self, request, obj=None):
+#        return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#    def has_delete_permission(self, request, obj=None):
+#        return False
 
     list_display = (
         'id',
