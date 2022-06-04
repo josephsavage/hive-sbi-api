@@ -189,11 +189,11 @@ def sync_trx(self):
             try:
                 sponsee_dict = json.loads(sponsee)
 
-                for account, units in sponsee_dict.items():
-                    if Member.objects.filter(account=account):
+                for sponsee_account, units in sponsee_dict.items():
+                    if Member.objects.filter(account=sponsee_account):
                         Sponsee.objects.create(
                             trx=trx,
-                            account=Member.objects.filter(account=account).first(),
+                            account=Member.objects.filter(account=sponsee_account).first(),
                             units=units,
                         )
 

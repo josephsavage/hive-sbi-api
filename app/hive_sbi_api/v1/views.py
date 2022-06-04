@@ -1,5 +1,6 @@
 import logging
 
+from django_filters import rest_framework as filters
 from rest_framework.mixins import (ListModelMixin,
                                    RetrieveModelMixin)
 
@@ -11,6 +12,8 @@ from hive_sbi_api.core.models import (Member,
                                       Transaction)
 from .serializers import (MemberSerializer,
                           TransactionSerializer)
+
+from .filters import TransactionFilter
 
 
 logger = logging.getLogger('v1')
@@ -65,7 +68,15 @@ class MemberViewSet(ListModelMixin,
 
 
 class TransactionViewSet(ListModelMixin,
+                         RetrieveModelMixin,
                          GenericViewSet):
 
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    lookup_field = 'index'
+
+    filter_backends = [
+        filters.DjangoFilterBackend,
+    ]
+
+    filterset_class = TransactionFilter
