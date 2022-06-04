@@ -26,7 +26,6 @@ class TransactionFilter(filters.FilterSet):
             'account',
             'sponsor',
             'status',
-            'status',
             'share_type',
             'sponsee',
         )
