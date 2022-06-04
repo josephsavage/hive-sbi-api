@@ -4,6 +4,11 @@ from hive_sbi_api.core.models import Transaction
 
 
 class TransactionFilter(filters.FilterSet):
+    sponsee = filters.CharFilter(
+        field_name='sponsees__account__account',
+        label='sponsee',
+    )
+
     class Meta:
         model = Transaction
         fields = (
@@ -13,5 +18,5 @@ class TransactionFilter(filters.FilterSet):
             'status',
             'status',
             'share_type',
-            'sponsees__account__account',
+            'sponsee',
         )
