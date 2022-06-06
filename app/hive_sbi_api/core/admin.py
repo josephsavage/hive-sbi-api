@@ -105,3 +105,11 @@ class FailedTransactionAdmin(admin.ModelAdmin):
         'fail_type',
         'is_solved',
     ]
+
+    readonly_fields = [
+        "fail_type",
+        "description",
+        "spoonse_text",
+        "trx_index",
+        "transaction",
+    ]
