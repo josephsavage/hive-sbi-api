@@ -266,9 +266,7 @@ class Member(models.Model):
 
 
 class Transaction(models.Model):
-    index = models.BigIntegerField(
-        primary_key=True,
-    )
+    index = models.BigIntegerField()
 
     source = models.CharField(
         choices=TRX_SOURCE_CHOICES,

@@ -156,35 +156,6 @@ def sync_trx(self):
 
             continue
 
-        try:
-            trx = Transaction.objects.create(
-                index=index,
-                source=pending_trx.source,
-                memo=pending_trx.memo,
-                account=account,
-                sponsor=sponsor,
-                shares=pending_trx.shares,
-                vests=pending_trx.vests,
-                timestamp=pending_trx.timestamp,
-                status=pending_trx.status,
-                share_type=pending_trx.share_type,
-            )  
-
-            created_transactions += 1
-
-        except IntegrityError as e:
-            FailedTransaction.objects.create(
-                trx_index=index,
-                transaction=trx,
-                fail_type=FAILED_TRX_TYPE_INDEX_ALREADY_EXISTS,
-                description="{}".format(e),
-                spoonse_text=sponsee,
-            )
-
-            failed_transactions += 1
-
-            continue
-
         if sponsee:
             try:
                 sponsee_dict = json.loads(sponsee)
