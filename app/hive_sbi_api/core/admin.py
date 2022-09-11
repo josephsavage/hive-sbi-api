@@ -66,11 +66,8 @@ class SponseeInline(admin.TabularInline):
 class TransactionAdmin(admin.ModelAdmin):
     inlines = (SponseeInline,)
 
-#    def has_add_permission(self, request, obj=None):
-#        return False
-
-#    def has_delete_permission(self, request, obj=None):
-#        return False
+    def has_add_permission(self, request, obj=None):
+        return False
 
     list_display = (
         'index',
@@ -82,6 +79,14 @@ class TransactionAdmin(admin.ModelAdmin):
         'share_type',
         'timestamp',
     )
+
+    search_fields = ['index',]
+
+    list_filter = [
+        'source',
+        'status',
+        'share_type',
+    ]
 
 
 @admin.register(FailedTransaction)
@@ -97,19 +102,25 @@ class FailedTransactionAdmin(admin.ModelAdmin):
         'fail_type',
         'trx_index',
         'transaction',
-        'spoonse_text',
-        'is_solved',
+        'status',
+        'share_type',
+        'account',
+        'sponsor',
     )
+
+    search_fields = ['trx_index',]
 
     list_filter = [
         'fail_type',
         'is_solved',
+        'status',
+        'share_type',
     ]
 
     readonly_fields = [
-        "fail_type",
-        "description",
-        "spoonse_text",
-        "trx_index",
+        # "fail_type",
+        # "description",
+        # "spoonse_text",
+        # "trx_index",
         "transaction",
     ]

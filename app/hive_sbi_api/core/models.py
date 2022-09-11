@@ -367,6 +367,12 @@ class FailedTransaction(models.Model):
         null=True,
     )
 
+    trx_data = models.JSONField(
+        blank=True,
+        null=True,
+        verbose_name=_('transaction data'),
+    )
+
     spoonse_text = models.TextField(
         blank=True,
         null=True,
@@ -374,6 +380,28 @@ class FailedTransaction(models.Model):
 
     is_solved = models.BooleanField(
         default=False,
+    )
+
+    status = models.CharField(
+        choices=TRX_STATUS_CHOICES,
+        max_length=50,
+    )
+
+    share_type = models.CharField(
+        choices=TRX_SHARE_TYPE_CHOICES,
+        max_length=50,
+    )
+
+    account = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    sponsor = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
     )
 
     def __str__(self):

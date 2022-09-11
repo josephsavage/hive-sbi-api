@@ -28,7 +28,10 @@ from hive_sbi_api.core.data import (FAILED_TRX_TYPE_NO_ACCOUNT,
                                     FAILED_TRX_TYPE_EMPTY_SPONSEE,
                                     FAILED_TRX_TYPE_NO_SPONSEE_ACCOUNT,
                                     FAILED_TRX_TYPE_BAD_SPONSEE_FORMAT,
-                                    FAILED_TRX_TYPE_INDEX_ALREADY_EXISTS)
+                                    FAILED_TRX_NOT_SYNCED_ACCOUNT,
+                                    FAILED_TRX_NOT_SYNCED_SPONSOR)
+
+from hive_sbi_api.core.serializers import SBITransactionSerializer
 
 
 logger = logging.getLogger('sbi')
@@ -119,42 +122,101 @@ def sync_trx(self):
 
     for pending_trx in pending_transactions:
         index = pending_trx.index
-        trx = None
-        account = None
-        sponsor = None
         sponsee = pending_trx.sponsee
+        trx = None
 
-        try:
-            account = Member.objects.get(account=pending_trx.account)
+        pending_trx_data = SBITransactionSerializer(pending_trx).data
+        pending_trx_account = pending_trx.account.strip()
+        pending_trx_sponsor = pending_trx.sponsor.strip()
 
-        except Member.DoesNotExist as e:            
-            FailedTransaction.objects.create(
-                transaction=trx,
-                trx_index=index,
-                fail_type=FAILED_TRX_TYPE_NO_ACCOUNT,
-                description="{}".format(e),
-                spoonse_text=sponsee,
-            )
+        account = Member.objects.filter(account=pending_trx_account).first()
+
+        if not account:
+            account = SBIMember.objects.filter(account=pending_trx_account).first()
+
+            if account:
+                FailedTransaction.objects.create(
+                    transaction=trx,
+                    trx_index=index,
+                    fail_type=FAILED_TRX_NOT_SYNCED_ACCOUNT,
+                    description="Not synced account",
+                    trx_data=pending_trx_data,
+                    spoonse_text=sponsee,
+                    share_type=pending_trx.share_type,
+                    status=pending_trx.status,
+                    account=pending_trx_account,
+                    sponsor=pending_trx_sponsor,
+                )
+
+            else:
+                FailedTransaction.objects.create(
+                    transaction=trx,
+                    trx_index=index,
+                    fail_type=FAILED_TRX_TYPE_NO_ACCOUNT,
+                    description="Account does not exist",
+                    trx_data=pending_trx_data,
+                    spoonse_text=sponsee,
+                    share_type=pending_trx.share_type,
+                    status=pending_trx.status,
+                    account=pending_trx_account,
+                    sponsor=pending_trx_sponsor,
+                )
 
             failed_transactions += 1
 
             continue
 
-        try:
-            sponsor = Member.objects.get(account=pending_trx.sponsor)
+        sponsor = Member.objects.filter(account=pending_trx_sponsor).first()
 
-        except Member.DoesNotExist as e:            
-            FailedTransaction.objects.create(
-                transaction=trx,
-                trx_index=index,
-                fail_type=FAILED_TRX_TYPE_NO_SPONSOR,
-                description="{}".format(e),
-                spoonse_text=sponsee,
-            )
+        if not sponsor:
+            sponsor = SBIMember.objects.filter(account=pending_trx_sponsor).first()
+
+            if sponsor:
+                FailedTransaction.objects.create(
+                    transaction=trx,
+                    trx_index=index,
+                    fail_type=FAILED_TRX_NOT_SYNCED_SPONSOR,
+                    description="Not synced sponsor",
+                    trx_data=pending_trx_data,
+                    spoonse_text=sponsee,
+                    share_type=pending_trx.share_type,
+                    status=pending_trx.status,
+                    account=pending_trx_account,
+                    sponsor=pending_trx_sponsor,
+                )
+
+            else:
+                FailedTransaction.objects.create(
+                    transaction=trx,
+                    trx_index=index,
+                    fail_type=FAILED_TRX_TYPE_NO_SPONSOR,
+                    description="Sponsor does not exist",
+                    trx_data=pending_trx_data,
+                    spoonse_text=sponsee,
+                    share_type=pending_trx.share_type,
+                    status=pending_trx.status,
+                    account=pending_trx_account,
+                    sponsor=pending_trx_sponsor,
+                )
 
             failed_transactions += 1
 
             continue
+
+        trx = Transaction.objects.create(
+            index=index,
+            source=pending_trx.source,
+            memo=pending_trx.memo,
+            account=account,
+            sponsor=sponsor,
+            shares=pending_trx.shares,
+            vests=pending_trx.vests,
+            timestamp=pending_trx.timestamp,
+            status=pending_trx.status,
+            share_type=pending_trx.share_type,
+        )  
+
+        created_transactions += 1
 
         if sponsee:
             try:
@@ -169,15 +231,25 @@ def sync_trx(self):
                         )
 
                     else:
-                        FailedTransaction.objects.create(
-                            trx_index=index,
+                        if not FailedTransaction.objects.filter(
                             transaction=trx,
+                            trx_index=index,
                             fail_type=FAILED_TRX_TYPE_NO_SPONSEE_ACCOUNT,
-                            description="Spoonse account does not exist",
-                            spoonse_text=sponsee,
-                        )
+                        ):
+                            FailedTransaction.objects.create(
+                                trx_index=index,
+                                transaction=trx,
+                                fail_type=FAILED_TRX_TYPE_NO_SPONSEE_ACCOUNT,
+                                description="Spoonse account does not exist",
+                                trx_data=pending_trx_data,
+                                spoonse_text=sponsee,
+                                share_type=pending_trx.share_type,
+                                status=pending_trx.status,
+                                account=pending_trx_account,
+                                sponsor=pending_trx_sponsor,
+                            )
 
-                        failed_transactions += 1
+                            failed_transactions += 1
 
             except json.decoder.JSONDecodeError as e:
                 FailedTransaction.objects.create(
@@ -185,7 +257,12 @@ def sync_trx(self):
                     transaction=trx,
                     fail_type=FAILED_TRX_TYPE_BAD_SPONSEE_FORMAT,
                     description="{}".format(e),
+                    trx_data=pending_trx_data,
                     spoonse_text=sponsee,
+                    share_type=pending_trx.share_type,
+                    status=pending_trx.status,
+                    account=pending_trx_account,
+                    sponsor=pending_trx_sponsor,
                 )
 
                 failed_transactions += 1
@@ -195,7 +272,12 @@ def sync_trx(self):
                 transaction=trx,
                 fail_type=FAILED_TRX_TYPE_EMPTY_SPONSEE,
                 description="No sponsee info",
+                trx_data=pending_trx_data,
                 spoonse_text=sponsee,
+                share_type=pending_trx.share_type,
+                status=pending_trx.status,
+                account=pending_trx_account,
+                sponsor=pending_trx_sponsor,
             )
 
             failed_transactions += 1
@@ -203,7 +285,7 @@ def sync_trx(self):
             continue
 
 
-    return "Created {} transactions. Failed {} transactions soopnse".format(
+    return "Created {} transactions. Failed {} transactions".format(
         created_transactions,
         failed_transactions,
     )
@@ -221,7 +303,6 @@ def sync_conf():
 @app.task(bind=True)
 def sync_members(self):
     sync_conf()
-    sync_trx.delay()
 
     sbi_conf = Configuration.objects.first()
 
@@ -362,6 +443,8 @@ def sync_members(self):
             'comment_upvote',
         ]
     )
+
+    sync_trx.delay()
 
     if failured_members_sync:
         self.update_state(
