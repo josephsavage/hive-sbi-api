@@ -278,17 +278,12 @@ class Transaction(models.Model):
         null=True,
     )
 
-    account = models.ForeignKey(
-        Member,
-        on_delete=models.CASCADE,
-        verbose_name=_('account'),
+    account = models.CharField(
+        max_length=200,
     )
 
-    sponsor = models.ForeignKey(
-        Member,
-        on_delete=models.CASCADE,
-        verbose_name=_('sponsor'),
-        related_name='sponsor',
+    sponsor = models.CharField(
+        max_length=200,
     )
 
     shares = models.IntegerField(
