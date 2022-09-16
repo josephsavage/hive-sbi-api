@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'hive_sbi_api.v0',
     'hive_sbi_api.v1',
     'hive_sbi_api.sbi',
+    'hive_sbi_api.hivesql',
 ]  + INSTALLED_APPS
 
 MIDDLEWARE = [
@@ -105,7 +106,16 @@ DATABASES = {
         'PASSWORD': os.environ.get('SBI_DB_PASSWORD', ''),
         'HOST': os.environ.get('SBI_DB_HOST', ''),
         'PORT': os.environ.get('SBI_DB_PORT', ''),
-    }
+    },
+    "hivesql": {
+        "ENGINE": "mssql",
+        "NAME": os.environ.get('HIVESQL_DB_NAME', ''),
+        "USER": os.environ.get('HIVESQL_USER', ''),
+        "PASSWORD": os.environ.get('HIVESQL_PASSWORD', ''),
+        "HOST": os.environ.get('HIVESQL_HOST', ''),
+        "PORT": os.environ.get('HIVESQL_PORT', "1433"),
+        # "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server",},
+    },
 }
 
 
