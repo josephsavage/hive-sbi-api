@@ -87,7 +87,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hive_sbi_api.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 DATABASES = {
@@ -102,6 +101,14 @@ DATABASES = {
     'sbi': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('SBI_DB_NAME', ''),
+        'USER': os.environ.get('SBI_DB_USER', ''),
+        'PASSWORD': os.environ.get('SBI_DB_PASSWORD', ''),
+        'HOST': os.environ.get('SBI_DB_HOST', ''),
+        'PORT': os.environ.get('SBI_DB_PORT', ''),
+    },
+    'sbi_steem_ops': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('SBI_STEEM_OPS_DB', ''),
         'USER': os.environ.get('SBI_DB_USER', ''),
         'PASSWORD': os.environ.get('SBI_DB_PASSWORD', ''),
         'HOST': os.environ.get('SBI_DB_HOST', ''),

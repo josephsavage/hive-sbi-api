@@ -411,3 +411,52 @@ class FailedTransaction(models.Model):
         verbose_name = 'failed transaction'
         verbose_name_plural = 'failed transactions'
         ordering  = ['-transaction']
+
+
+class Post(models.Model):
+    author = models.CharField(max_length=50)
+    permlink = models.CharField(max_length=512)
+    title = models.TextField()
+    created = models.DateTimeField()
+    vote_rshares = models.BigIntegerField()
+    total_payout_value = models.FloatField()
+    author_rewards = models.FloatField()
+    active_votes = models.JSONField(
+        null=True,
+    )
+
+    def __str__(self):
+        return "{}@{}".format(
+            self.author,
+            self.permlink,
+        )
+
+    class Meta:
+        verbose_name = 'member post'
+        verbose_name_plural = 'member posts'
+        ordering  = ['created']
+
+
+class Vote(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        verbose_name=_('post'),
+    )
+    voter = models.CharField(max_length=50)
+    weight = models.BigIntegerField()
+    rshares = models.BigIntegerField()
+    percent = models.IntegerField()
+    reputation = models.IntegerField()
+    time = models.DateTimeField()
+
+    def __str__(self):
+        return "{} - {}".format(
+            self.voter,
+            self.post,
+        )
+
+    class Meta:
+        verbose_name = 'vote'
+        verbose_name_plural = 'votes'
+        ordering  = ['time']
