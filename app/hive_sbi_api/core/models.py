@@ -426,14 +426,14 @@ class Post(models.Model):
     )
 
     def __str__(self):
-        return "{}@{}".format(
+        return "@{}/{}".format(
             self.author,
             self.permlink,
         )
 
     class Meta:
-        verbose_name = 'member post'
-        verbose_name_plural = 'member posts'
+        verbose_name = 'post'
+        verbose_name_plural = 'posts'
         ordering  = ['created']
 
 
@@ -446,9 +446,10 @@ class Vote(models.Model):
     voter = models.CharField(max_length=50)
     weight = models.BigIntegerField()
     rshares = models.BigIntegerField()
-    percent = models.IntegerField()
-    reputation = models.IntegerField()
+    percent = models.BigIntegerField()
+    reputation = models.BigIntegerField()
     time = models.DateTimeField()
+    member_hist_datetime = models.DateTimeField()
 
     def __str__(self):
         return "{} - {}".format(

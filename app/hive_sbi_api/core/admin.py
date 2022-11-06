@@ -4,7 +4,9 @@ from .models import (Member,
                      Configuration,
                      Transaction,
                      Sponsee,
-                     FailedTransaction)
+                     FailedTransaction,
+                     Post,
+                     Vote)
 
 
 @admin.register(Member)
@@ -123,4 +125,81 @@ class FailedTransactionAdmin(admin.ModelAdmin):
         # "spoonse_text",
         # "trx_index",
         "transaction",
+    ]
+
+
+class VoteInline(admin.TabularInline):
+    model = Vote
+    verbose_name_plural = 'votes'
+    extra = 0
+
+    readonly_fields = [
+        'voter',
+        'weight',
+        'rshares',
+        'percent',
+        'reputation',
+        'post',
+        #'time',
+        #'member_hist_datetime',
+    ]
+
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    inlines = (VoteInline,)
+
+    list_display = (
+        'permlink',
+        'author',
+        'title',
+        'created',
+    )
+
+    search_fields = ['author', 'permlink', 'title']
+
+    list_filter = [
+        'created',
+    ]
+
+    readonly_fields = [
+        'permlink',
+        'author',
+        'title',
+        'created',
+        'vote_rshares',
+        'total_payout_value',
+        'author_rewards',
+        'active_votes',
+    ]
+
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    list_display = (
+        'post',
+        'voter',
+        'weight',
+        'rshares',
+        'percent',
+        'reputation',
+        'time',
+    )
+
+    search_fields = ['post__author', 'post__permlink', 'post__title']
+
+    list_filter = [
+        'voter',
+        'time',
+    ]
+
+    readonly_fields = [
+        'voter',
+        'weight',
+        'rshares',
+        'percent',
+        'reputation',
+        'post',
+        #'time',
+        #'member_hist_datetime',
     ]

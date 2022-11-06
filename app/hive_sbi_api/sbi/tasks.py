@@ -33,6 +33,8 @@ from hive_sbi_api.core.data import (FAILED_TRX_TYPE_NO_ACCOUNT,
 
 from hive_sbi_api.core.serializers import SBITransactionSerializer
 
+from hive_sbi_api.hivesql.tasks import sync_post_votes
+
 
 logger = logging.getLogger('sbi')
 
@@ -445,6 +447,7 @@ def sync_members(self):
     )
 
     sync_trx.delay()
+    sync_post_votes.delay()
 
     if failured_members_sync:
         self.update_state(

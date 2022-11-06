@@ -43,6 +43,10 @@ LOGGING = {
             'level': 'DEBUG',
             'handlers': ['console'],
         },
+        'hivesql': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
         'webapp': {
             'level': 'DEBUG',
             'handlers': ['console'],
