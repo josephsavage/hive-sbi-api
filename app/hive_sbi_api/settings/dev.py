@@ -5,7 +5,7 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda self: True
 }
 
-ALLOWED_HOSTS = ['172.21.0.1', 'localhost']
+ALLOWED_HOSTS = ['172.21.0.1', '172.20.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django_extensions',

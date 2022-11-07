@@ -6,6 +6,7 @@ from hive_sbi_api.core.models import Transaction
 class TransactionFilter(filters.FilterSet):
     account = filters.CharFilter(
         field_name='account__account',
+        lookup_expr='iexact',
         label='account',
     )
 
