@@ -12,11 +12,13 @@ class TransactionFilter(filters.FilterSet):
 
     sponsor = filters.CharFilter(
         field_name='sponsor__account',
+        lookup_expr='iexact',
         label='sponsor',
     )
 
     sponsee = filters.CharFilter(
         field_name='sponsees__account__account',
+        lookup_expr='iexact',
         label='sponsee',
     )
 
