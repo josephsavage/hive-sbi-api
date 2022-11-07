@@ -23,13 +23,9 @@ from hive_sbi_api.core.models import (Member,
                                       Sponsee,
                                       FailedTransaction)
 
-from hive_sbi_api.core.data import (FAILED_TRX_TYPE_NO_ACCOUNT,
-                                    FAILED_TRX_TYPE_NO_SPONSOR,
-                                    FAILED_TRX_TYPE_EMPTY_SPONSEE,
+from hive_sbi_api.core.data import (FAILED_TRX_TYPE_EMPTY_SPONSEE,
                                     FAILED_TRX_TYPE_NO_SPONSEE_ACCOUNT,
-                                    FAILED_TRX_TYPE_BAD_SPONSEE_FORMAT,
-                                    FAILED_TRX_NOT_SYNCED_ACCOUNT,
-                                    FAILED_TRX_NOT_SYNCED_SPONSOR)
+                                    FAILED_TRX_TYPE_BAD_SPONSEE_FORMAT)
 
 from hive_sbi_api.core.serializers import SBITransactionSerializer
 
@@ -131,86 +127,12 @@ def sync_trx(self):
         pending_trx_account = pending_trx.account.strip()
         pending_trx_sponsor = pending_trx.sponsor.strip()
 
-        account = Member.objects.filter(account=pending_trx_account).first()
-
-        if not account:
-            account = SBIMember.objects.filter(account=pending_trx_account).first()
-
-            if account:
-                FailedTransaction.objects.create(
-                    transaction=trx,
-                    trx_index=index,
-                    fail_type=FAILED_TRX_NOT_SYNCED_ACCOUNT,
-                    description="Not synced account",
-                    trx_data=pending_trx_data,
-                    spoonse_text=sponsee,
-                    share_type=pending_trx.share_type,
-                    status=pending_trx.status,
-                    account=pending_trx_account,
-                    sponsor=pending_trx_sponsor,
-                )
-
-            else:
-                FailedTransaction.objects.create(
-                    transaction=trx,
-                    trx_index=index,
-                    fail_type=FAILED_TRX_TYPE_NO_ACCOUNT,
-                    description="Account does not exist",
-                    trx_data=pending_trx_data,
-                    spoonse_text=sponsee,
-                    share_type=pending_trx.share_type,
-                    status=pending_trx.status,
-                    account=pending_trx_account,
-                    sponsor=pending_trx_sponsor,
-                )
-
-            failed_transactions += 1
-
-            continue
-
-        sponsor = Member.objects.filter(account=pending_trx_sponsor).first()
-
-        if not sponsor:
-            sponsor = SBIMember.objects.filter(account=pending_trx_sponsor).first()
-
-            if sponsor:
-                FailedTransaction.objects.create(
-                    transaction=trx,
-                    trx_index=index,
-                    fail_type=FAILED_TRX_NOT_SYNCED_SPONSOR,
-                    description="Not synced sponsor",
-                    trx_data=pending_trx_data,
-                    spoonse_text=sponsee,
-                    share_type=pending_trx.share_type,
-                    status=pending_trx.status,
-                    account=pending_trx_account,
-                    sponsor=pending_trx_sponsor,
-                )
-
-            else:
-                FailedTransaction.objects.create(
-                    transaction=trx,
-                    trx_index=index,
-                    fail_type=FAILED_TRX_TYPE_NO_SPONSOR,
-                    description="Sponsor does not exist",
-                    trx_data=pending_trx_data,
-                    spoonse_text=sponsee,
-                    share_type=pending_trx.share_type,
-                    status=pending_trx.status,
-                    account=pending_trx_account,
-                    sponsor=pending_trx_sponsor,
-                )
-
-            failed_transactions += 1
-
-            continue
-
         trx = Transaction.objects.create(
             index=index,
             source=pending_trx.source,
             memo=pending_trx.memo,
-            account=account,
-            sponsor=sponsor,
+            account=pending_trx_account,
+            sponsor=pending_trx_sponsor,
             shares=pending_trx.shares,
             vests=pending_trx.vests,
             timestamp=pending_trx.timestamp,

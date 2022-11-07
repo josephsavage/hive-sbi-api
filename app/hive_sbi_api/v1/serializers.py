@@ -54,9 +54,6 @@ class SponseeSerializer(serializers.ModelSerializer):
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    account = serializers.CharField(source='account.account')
-    sponsor = serializers.CharField(source='sponsor.account')
-
     sponsees = SponseeSerializer(many=True, read_only=True)
 
     class Meta:
