@@ -177,8 +177,8 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Vote)
 class VoteAdmin(admin.ModelAdmin):
     list_display = (
-        'post',
         'voter',
+        'post',
         'weight',
         'rshares',
         'percent',
