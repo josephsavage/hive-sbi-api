@@ -220,3 +220,43 @@ class SBITransaction(models.Model):
     class Meta:
         managed = False
         db_table = 'trx'
+
+
+class SBISteemOpsManager(models.Manager):
+    def __init__(self):
+        super().__init__()
+        self._db = 'sbi_steem_ops'
+
+
+class MemberHist(models.Model):
+    objects = SBISteemOpsManager()
+
+    author = models.CharField(max_length=50)
+    permlink = models.CharField(
+        max_length=512,
+        primary_key=True,
+    )
+    timestamp = models.DateTimeField()
+
+    voter = models.CharField(max_length=50)
+
+    class Meta:
+        managed = False
+        db_table = 'member_hist'
+        ordering  = ['timestamp']
+
+
+class PostComment(models.Model):
+    objects = SBISteemOpsManager()
+
+    authorperm = models.CharField(
+        max_length=700,
+        primary_key=True,
+    )
+    author = models.CharField(max_length=50)
+    created = models.DateTimeField()
+    voted = models.SmallIntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'posts_comments'

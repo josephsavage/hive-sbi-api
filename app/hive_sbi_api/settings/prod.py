@@ -35,6 +35,10 @@ LOGGING = {
             'level': 'INFO',
             'handlers': ['console'],
         },
+        'hivesql': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
         'webapp': {
             'level': 'INFO',
             'handlers': ['console'],

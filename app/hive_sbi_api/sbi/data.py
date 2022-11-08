@@ -1,0 +1,27 @@
+VOTER_STEEM_BASIC_INCOME = 'steembasicincome'
+VOTER_SBI_10 = 'sbi10'
+VOTER_SBI_9 = 'sbi9'
+VOTER_SBI_8 = 'sbi8'
+VOTER_SBI_7 = 'sbi7'
+VOTER_SBI_6 = 'sbi6'
+VOTER_SBI_5 = 'sbi5'
+VOTER_SBI_4 = 'sbi4'
+VOTER_SBI_3 = 'sbi3'
+VOTER_SBI_2 = 'sbi2'
+VOTER_SBI_TOKENS = 'sbi-tokens'
+VOTER_SBI_BOOSTER = 'sbi-booster'
+
+VOTER_ACCOUNTS = [
+    VOTER_STEEM_BASIC_INCOME,
+    VOTER_SBI_10,
+    VOTER_SBI_9,
+    VOTER_SBI_8,
+    VOTER_SBI_7,
+    VOTER_SBI_6,
+    VOTER_SBI_5,
+    VOTER_SBI_4,
+    VOTER_SBI_3,
+    VOTER_SBI_2,
+    VOTER_SBI_TOKENS, 
+    VOTER_SBI_BOOSTER,
+]
