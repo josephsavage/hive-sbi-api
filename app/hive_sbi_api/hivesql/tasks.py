@@ -1,4 +1,8 @@
 import logging
+import pytz
+
+from datetime import (datetime,
+                      timedelta)
 
 from celery import (current_app,
                     states as celery_states)
@@ -26,14 +30,19 @@ def sync_post_votes(self):
         last_sync_vote = Vote.objects.latest("time")
         last_sync_datetime = last_sync_vote.member_hist_datetime
 
+    timestamp_limit = datetime.now() - timedelta(days=7)
+    timestamp_limit = timestamp_limit.replace(tzinfo=pytz.UTC)
+
     if last_sync_datetime:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__gt=last_sync_datetime,
+            timestamp__lt=timestamp_limit,
         )[:1000]
     else:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
+            timestamp__lt=timestamp_limit,
         )[:1000]
 
     new_posts_counter = 0
@@ -51,6 +60,8 @@ def sync_post_votes(self):
         ).first()
 
         if not post:
+            new_posts_counter += 1
+
             hivesql_comment = HiveSQLComment.objects.filter(
                 author=author,
                 permlink=permlink,
@@ -65,11 +76,14 @@ def sync_post_votes(self):
                 total_payout_value=hivesql_comment.total_payout_value,
                 author_rewards=hivesql_comment.author_rewards,
                 active_votes=hivesql_comment.active_votes,
+                total_rshares=0,
             )
 
-            new_posts_counter += 1
+            total_rshares = 0
 
             for vote in post.active_votes:
+                total_rshares = total_rshares + int(vote["rshares"])
+
                 if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(post=post, voter=vote["voter"]):
 
                     member_hist_vote = MemberHist.objects.filter(
@@ -94,6 +108,9 @@ def sync_post_votes(self):
                         time=vote["time"],
                         member_hist_datetime=member_hist_datetime,
                     ))
+
+            post.total_rshares = total_rshares
+            post.save()
 
     Vote.objects.bulk_create(votes_for_create)
 

@@ -420,6 +420,8 @@ class Post(models.Model):
         null=True,
     )
 
+    total_rshares = models.BigIntegerField()
+
     def __str__(self):
         return "@{}/{}".format(
             self.author,

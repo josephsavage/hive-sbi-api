@@ -171,6 +171,7 @@ class PostAdmin(admin.ModelAdmin):
         'total_payout_value',
         'author_rewards',
         'active_votes',
+        'total_rshares',
     ]
 
 
