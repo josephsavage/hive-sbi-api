@@ -20,6 +20,15 @@ logger = logging.getLogger('hivesql')
 app = current_app._get_current_object()
 
 
+@app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(minute=30, hour='*/1'),
+        sync_post_votes.s(),
+        name='sync_post_votes',
+    )
+
+
 @app.task(bind=True)
 def sync_post_votes(self):
     logger.info("Initializing votes sync")
@@ -38,12 +47,12 @@ def sync_post_votes(self):
             voter__in=VOTER_ACCOUNTS,
             timestamp__gt=last_sync_datetime,
             timestamp__lt=timestamp_limit,
-        )[:1000]
+        )[:1500]
     else:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__lt=timestamp_limit,
-        )[:1000]
+        )[:1500]
 
     new_posts_counter = 0
     votes_for_create = []
@@ -95,7 +104,6 @@ def sync_post_votes(self):
                     if member_hist_vote:
                         member_hist_datetime = member_hist_vote.timestamp 
                     else:
-                        logger.info("Vote is not registered in the steem_ops DB")
                         member_hist_datetime = timestamp
 
                     votes_for_create.append(Vote(
