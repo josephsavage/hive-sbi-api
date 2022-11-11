@@ -94,6 +94,11 @@ class PostViewSet(ListModelMixin,
 
     filter_backends = [
         filters.DjangoFilterBackend,
+        OrderingFilter,
     ]
 
     filterset_class = PostFilter
+
+    ordering_fields = [
+        'created',
+    ]
