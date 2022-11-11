@@ -1,6 +1,7 @@
 from django_filters import rest_framework as filters
 
-from hive_sbi_api.core.models import Transaction
+from hive_sbi_api.core.models import (Transaction,
+                                      Post)
 
 
 class TransactionFilter(filters.FilterSet):
@@ -31,4 +32,18 @@ class TransactionFilter(filters.FilterSet):
             'status',
             'share_type',
             'sponsee',
+        )
+
+
+class PostFilter(filters.FilterSet):
+    author = filters.CharFilter(
+        field_name='author',
+        lookup_expr='iexact',
+        label='author',
+    )
+
+    class Meta:
+        model = Post
+        fields = (
+            'author',
         )
