@@ -2,7 +2,9 @@ from rest_framework import serializers
 
 from hive_sbi_api.core.models import (Member,
                                       Transaction,
-                                      Sponsee)
+                                      Sponsee,
+                                      Post,
+                                      Vote)
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -70,4 +72,36 @@ class TransactionSerializer(serializers.ModelSerializer):
             'timestamp',
             'status',
             'share_type',
+        ]
+
+
+class VoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vote
+        fields = [
+            'voter',
+            'weight',
+            'rshares',
+            'percent',
+            'reputation',
+            'time',
+        ]
+
+
+class PostSerializer(serializers.ModelSerializer):
+    vote_set = VoteSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Post
+        fields = [
+            'id',
+            'author',
+            'permlink',
+            'title',
+            'created',
+            'vote_rshares',
+            'total_payout_value',
+            'author_rewards',
+            'total_rshares',
+            'vote_set',
         ]

@@ -9,11 +9,14 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.generics import get_object_or_404
 
 from hive_sbi_api.core.models import (Member,
-                                      Transaction)
+                                      Transaction,
+                                      Post)
 from .serializers import (MemberSerializer,
-                          TransactionSerializer)
+                          TransactionSerializer,
+                          PostSerializer)
 
-from .filters import TransactionFilter
+from .filters import (TransactionFilter,
+                      PostFilter)
 
 
 logger = logging.getLogger('v1')
@@ -80,3 +83,22 @@ class TransactionViewSet(ListModelMixin,
     ]
 
     filterset_class = TransactionFilter
+
+
+class PostViewSet(ListModelMixin,
+                         RetrieveModelMixin,
+                         GenericViewSet):
+
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    filter_backends = [
+        filters.DjangoFilterBackend,
+        OrderingFilter,
+    ]
+
+    filterset_class = PostFilter
+
+    ordering_fields = [
+        'created',
+    ]
