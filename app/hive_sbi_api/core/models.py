@@ -465,7 +465,7 @@ class Vote(models.Model):
         if not self.rshares:
             return self.rshares
 
-        return self.post.total_payout_value * 0.5 / (self.rshares / self.post.total_rshares)
+        return self.post.total_payout_value * 0.5 * (self.rshares / self.post.total_rshares)
 
     def __str__(self):
         return "{} - {}".format(
