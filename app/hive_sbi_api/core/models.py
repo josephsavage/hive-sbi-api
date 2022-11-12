@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -5,6 +7,9 @@ from .data import (TRX_SOURCE_CHOICES,
                    TRX_STATUS_CHOICES,
                    TRX_SHARE_TYPE_CHOICES,
                    FAILED_TRX_TYPE_CHOICES)
+
+
+logger = logging.getLogger('v1')
 
  
 class Configuration(models.Model):
@@ -422,6 +427,14 @@ class Post(models.Model):
 
     total_rshares = models.BigIntegerField()
 
+    def get_hbd_rewards(self):
+        hbd_rewards = 0
+
+        for vote in self.vote_set.all():
+            hbd_rewards = hbd_rewards + vote.get_hbd_rewards()
+
+        return hbd_rewards
+
     def __str__(self):
         return "@{}/{}".format(
             self.author,
@@ -447,6 +460,12 @@ class Vote(models.Model):
     reputation = models.BigIntegerField()
     time = models.DateTimeField()
     member_hist_datetime = models.DateTimeField()
+
+    def get_hbd_rewards(self):
+        if not self.rshares:
+            return self.rshares
+
+        return self.post.total_payout_value * 0.5 / (self.rshares / self.post.total_rshares)
 
     def __str__(self):
         return "{} - {}".format(

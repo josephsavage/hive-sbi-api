@@ -23,6 +23,10 @@ LOGGING = {
             'level': 'INFO',
             'handlers': ['console'],
         },
+        'core': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
         'v0': {
             'level': 'INFO',
             'handlers': ['console'],

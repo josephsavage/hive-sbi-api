@@ -76,6 +76,8 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class VoteSerializer(serializers.ModelSerializer):
+    hbd_rewards = serializers.FloatField(source='get_hbd_rewards')
+
     class Meta:
         model = Vote
         fields = [
@@ -85,10 +87,12 @@ class VoteSerializer(serializers.ModelSerializer):
             'percent',
             'reputation',
             'time',
+            'hbd_rewards',
         ]
 
 
 class PostSerializer(serializers.ModelSerializer):
+    hbd_rewards = serializers.FloatField(source='get_hbd_rewards')
     vote_set = VoteSerializer(many=True, read_only=True)
 
     class Meta:
@@ -103,5 +107,6 @@ class PostSerializer(serializers.ModelSerializer):
             'total_payout_value',
             'author_rewards',
             'total_rshares',
+            'hbd_rewards',
             'vote_set',
         ]
