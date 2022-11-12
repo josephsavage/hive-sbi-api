@@ -76,6 +76,9 @@ def sync_post_votes(self):
                 permlink=permlink,
             ).first()
 
+            if not hivesql_comment:
+                continue
+
             post = Post.objects.create(
                 author=hivesql_comment.author,
                 permlink=hivesql_comment.permlink,
