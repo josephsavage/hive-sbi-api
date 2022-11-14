@@ -30,6 +30,60 @@ def setup_periodic_tasks(sender, **kwargs):
 
 
 @app.task(bind=True)
+def sync_empty_votes_posts(self):
+    empty_votes_posts = Post.objects.filter(
+        vote=None,
+        empty_votes=False,
+    )
+
+    empty_votes_posts_counter = 0
+    synchronized_posts = 0
+
+    for post in empty_votes_posts:
+        votes_for_create = []
+
+        for vote in post.active_votes:
+            if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(post=post, voter=vote["voter"]):
+                member_hist_vote = MemberHist.objects.filter(
+                    author=post.author,
+                    permlink=post.permlink,
+                    voter=vote["voter"],
+                ).first()
+
+                if member_hist_vote:
+                    member_hist_datetime = member_hist_vote.timestamp
+                else:
+                    member_hist_datetime = post.created
+
+                votes_for_create.append(Vote(
+                    post=post,
+                    voter=vote["voter"],
+                    weight=vote["weight"],
+                    rshares=vote["rshares"],
+                    percent=vote["percent"],
+                    reputation=vote["reputation"],
+                    time=vote["time"],
+                    member_hist_datetime=member_hist_datetime,
+                ))
+
+        if not votes_for_create:
+            post.empty_votes = True
+            post.save()
+
+            empty_votes_posts_counter += 1
+
+            continue
+
+        Vote.objects.bulk_create(votes_for_create)
+        synchronized_posts += 1
+
+    return "Found {} posts without votes. {} posts synchronized.".format(
+        empty_votes_posts_counter,
+        synchronized_posts,
+    )
+
+
+@app.task(bind=True)
 def sync_post_votes(self):
     logger.info("Initializing votes sync")
 
@@ -124,5 +178,6 @@ def sync_post_votes(self):
             post.save()
 
     Vote.objects.bulk_create(votes_for_create)
+    sync_empty_votes_posts.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))

@@ -160,6 +160,7 @@ class PostAdmin(admin.ModelAdmin):
 
     list_filter = [
         'created',
+        'empty_votes',
     ]
 
     readonly_fields = [
@@ -172,6 +173,7 @@ class PostAdmin(admin.ModelAdmin):
         'author_rewards',
         'active_votes',
         'total_rshares',
+        'empty_votes',
     ]
 
 
