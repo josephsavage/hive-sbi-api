@@ -426,6 +426,7 @@ class Post(models.Model):
     )
 
     total_rshares = models.BigIntegerField()
+    empty_votes = models.BooleanField(default=False)
 
     def get_hbd_rewards(self):
         hbd_rewards = 0
