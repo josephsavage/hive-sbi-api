@@ -1,6 +1,8 @@
 import logging
 import pytz
 
+import pandas as pd
+
 from datetime import (datetime,
                       timedelta)
 
@@ -10,10 +12,12 @@ from celery.exceptions import Ignore
 from celery.schedules import crontab
 
 from hive_sbi_api.core.models import (Post,
-                                      Vote)
+                                      Vote,
+                                      MaxDailyHivePerMVest)
 from hive_sbi_api.sbi.models import MemberHist
 from hive_sbi_api.sbi.data import VOTER_ACCOUNTS
-from hive_sbi_api.hivesql.models import HiveSQLComment
+from hive_sbi_api.hivesql.models import (HiveSQLComment,
+                                         VoFillVestingWithdraw)
 
 
 logger = logging.getLogger('hivesql')
@@ -28,6 +32,58 @@ def setup_periodic_tasks(sender, **kwargs):
         name='sync_post_votes',
     )
 
+
+@app.task(bind=True)
+def set_max_vo_fill_vesting_withdrawn(self):
+    if MaxDailyHivePerMVest.objects.exists():
+        last_register = MaxDailyHivePerMVest.objects.latest("timestamp")
+        last_registered_date = last_register.timestamp
+    else:
+        last_registered_date = VoFillVestingWithdraw.objects.first().timestamp
+
+    init_date = last_registered_date + timedelta(days=1)
+
+    end_date = init_date + timedelta(days=30)
+    max_hive_per_mvests_for_create = []
+    daterange = pd.date_range(init_date, end_date)
+
+    for single_date in daterange:
+        date_registers = VoFillVestingWithdraw.objects.filter(
+            withdrawn_symbol="VESTS",
+            deposited_symbol="HIVE",
+            timestamp__year=single_date.year,
+            timestamp__month=single_date.month,
+            timestamp__day=single_date.day,
+        )
+
+        if not date_registers:
+            if not MaxDailyHivePerMVest.objects.filter(
+                timestamp__year=single_date.year,
+                timestamp__month=single_date.month,
+                timestamp__day=single_date.day,
+            ):
+
+                max_hive_per_mvests_for_create.append(MaxDailyHivePerMVest(
+                    timestamp=single_date
+                ))
+
+            continue
+
+        max_hive_per_mvest_obj = max(date_registers, key=lambda register: register.get_hive_per_mvest())
+
+        max_hive_per_mvests_for_create.append(MaxDailyHivePerMVest(
+            hivesql_id=max_hive_per_mvest_obj.ID,
+            block_num=max_hive_per_mvest_obj.block_num,
+            timestamp=max_hive_per_mvest_obj.timestamp,
+            hive_per_mvest=max_hive_per_mvest_obj.get_hive_per_mvest()
+        ))
+
+    MaxDailyHivePerMVest.objects.bulk_create(max_hive_per_mvests_for_create)
+
+    return "Calculated between {} and {}.".format(
+        init_date,
+        end_date,
+    )
 
 @app.task(bind=True)
 def sync_empty_votes_posts(self):
@@ -179,5 +235,6 @@ def sync_post_votes(self):
 
     Vote.objects.bulk_create(votes_for_create)
     sync_empty_votes_posts.delay()
+    set_max_vo_fill_vesting_withdrawn.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))

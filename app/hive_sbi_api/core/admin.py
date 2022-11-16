@@ -6,7 +6,8 @@ from .models import (Member,
                      Sponsee,
                      FailedTransaction,
                      Post,
-                     Vote)
+                     Vote,
+                     MaxDailyHivePerMVest)
 
 
 @admin.register(Member)
@@ -205,4 +206,26 @@ class VoteAdmin(admin.ModelAdmin):
         'post',
         #'time',
         #'member_hist_datetime',
+    ]
+
+
+@admin.register(MaxDailyHivePerMVest)
+class MaxDailyHivePerMVestAdmin(admin.ModelAdmin):
+    list_display = (
+        'timestamp',
+        'hive_per_mvest',
+        'block_num',
+        'hivesql_id',
+    )
+
+    readonly_fields = [
+        'timestamp',
+        'hive_per_mvest',
+        'block_num',
+        'hivesql_id',
+    ]
+
+    list_filter = [
+        'timestamp',
+        ("hive_per_mvest", admin.EmptyFieldListFilter),
     ]
