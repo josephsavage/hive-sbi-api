@@ -52,3 +52,28 @@ class HiveSQLTxVotes(models.Model):
     class Meta:
         managed = False
         db_table = 'TxVotes'
+
+
+class VoFillVestingWithdraw(models.Model):
+    objects = HiveSQLManager()
+
+    ID = models.BigIntegerField(primary_key=True)
+    block_num = models.BigIntegerField()
+    timestamp = models.DateTimeField()
+    from_account = models.CharField(max_length=50)
+    to_account = models.CharField(max_length=50)
+    withdrawn = models.FloatField()
+    withdrawn_symbol = models.CharField(max_length=50)
+    deposited = models.FloatField()
+    deposited_symbol = models.CharField(max_length=50)
+
+    def get_hive_per_mvest(self):
+        return self.deposited / (self.withdrawn / 1000)
+
+    def __str__(self):
+        return "{} - {}".format(self.ID, self.timestamp)
+
+    class Meta:
+        managed = False
+        db_table = 'VOFillVestingWithdraws'
+        ordering  = ['timestamp']

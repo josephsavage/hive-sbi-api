@@ -478,3 +478,29 @@ class Vote(models.Model):
         verbose_name = 'vote'
         verbose_name_plural = 'votes'
         ordering  = ['time']
+
+
+class MaxDailyHivePerMVest(models.Model):
+    timestamp = models.DateTimeField()
+    hivesql_id = models.BigIntegerField(
+        blank=True,
+        null=True,
+    )
+    block_num = models.BigIntegerField(
+        blank=True,
+        null=True,)
+    hive_per_mvest = models.FloatField(
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return "{} - {}".format(
+            self.hive_per_mvest,
+            self.timestamp,
+        )
+
+    class Meta:
+        verbose_name = 'maximum daily Hive per mvest'
+        verbose_name_plural = 'maximum daily Hive per mvest'
+        ordering  = ['timestamp']
