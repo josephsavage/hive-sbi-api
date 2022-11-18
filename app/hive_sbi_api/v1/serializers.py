@@ -77,6 +77,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 class VoteSerializer(serializers.ModelSerializer):
     hbd_rewards = serializers.FloatField(source='get_hbd_rewards')
+    hive_power_rewards = serializers.FloatField(source='get_hive_power_rewards')
 
     class Meta:
         model = Vote
@@ -88,11 +89,14 @@ class VoteSerializer(serializers.ModelSerializer):
             'reputation',
             'time',
             'hbd_rewards',
+            'hive_power_rewards',
         ]
 
 
 class PostSerializer(serializers.ModelSerializer):
     hbd_rewards = serializers.FloatField(source='get_hbd_rewards')
+    hive_power_rewards = serializers.FloatField(source='get_hive_power_rewards')
+
     vote_set = VoteSerializer(many=True, read_only=True)
 
     class Meta:
@@ -108,5 +112,6 @@ class PostSerializer(serializers.ModelSerializer):
             'author_rewards',
             'total_rshares',
             'hbd_rewards',
+            'hive_power_rewards',
             'vote_set',
         ]
