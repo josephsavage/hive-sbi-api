@@ -436,6 +436,15 @@ class Post(models.Model):
 
         return hbd_rewards
 
+    def get_hive_power_rewards(self):
+        hive_power_rewards = 0
+
+        for vote in self.vote_set.all():
+            if vote.get_hive_power_rewards() is not None:
+                hive_power_rewards = hive_power_rewards + vote.get_hive_power_rewards()
+
+        return hive_power_rewards
+
     def __str__(self):
         return "@{}/{}".format(
             self.author,
@@ -467,6 +476,26 @@ class Vote(models.Model):
             return self.rshares
 
         return self.post.total_payout_value * 0.5 * (self.rshares / self.post.total_rshares)
+
+    def get_hive_power_rewards(self):
+        if not self.rshares:
+            return self.rshares
+
+        max_hive_per_mvest = MaxDailyHivePerMVest.objects.filter(
+            timestamp__year=self.time.year,
+            timestamp__month=self.time.month,
+            timestamp__day=self.time.day,
+        ).first()
+
+        if not max_hive_per_mvest:
+            return None
+
+        hive_per_mvest = max_hive_per_mvest.hive_per_mvest
+
+        if not hive_per_mvest:
+            return hive_per_mvest
+
+        return (self.post.author_rewards / hive_per_mvest) * (self.rshares / self.post.total_rshares)
 
     def __str__(self):
         return "{} - {}".format(
