@@ -68,6 +68,9 @@ class VoFillVestingWithdraw(models.Model):
     deposited_symbol = models.CharField(max_length=50)
 
     def get_hive_per_mvest(self):
+        if self.withdrawn == 0:
+            return 0
+
         return self.deposited / (self.withdrawn / 1000)
 
     def __str__(self):
