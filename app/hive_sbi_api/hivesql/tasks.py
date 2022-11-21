@@ -11,6 +11,8 @@ from celery import (current_app,
 from celery.exceptions import Ignore
 from celery.schedules import crontab
 
+from django.utils import timezone
+
 from hive_sbi_api.core.models import (Post,
                                       Vote,
                                       MaxDailyHivePerMVest)
@@ -44,7 +46,7 @@ def set_max_vo_fill_vesting_withdrawn(self):
     init_date = last_registered_date + timedelta(days=1)
 
     end_date = init_date + timedelta(days=30)
-    now = datetime.now()
+    now = timezone.now()
     if end_date > now:
         end_date = now
 
