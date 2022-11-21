@@ -78,7 +78,7 @@ class VoFillVestingWithdraw(models.Model):
         logger.info(self.deposited)
         logger.info(self.withdrawn)
 
-        return self.deposited * 10000 / self.withdrawn
+        return self.deposited * 10000 * 100 / self.withdrawn
 
     def __str__(self):
         return "{} - {}".format(self.ID, self.timestamp)
