@@ -29,7 +29,7 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute='*/45'),
+        crontab(minute=30, hour='*/1'),
         sync_post_votes.s(),
         name='sync_post_votes',
     )
@@ -167,12 +167,12 @@ def sync_post_votes(self):
             voter__in=VOTER_ACCOUNTS,
             timestamp__gt=last_sync_datetime,
             timestamp__lt=timestamp_limit,
-        )[:50]
+        )[:2500]
     else:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__lt=timestamp_limit,
-        )[:50]
+        )[:2500]
 
     new_posts_counter = 0
     votes_for_create = []
