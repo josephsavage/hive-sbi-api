@@ -1,4 +1,8 @@
+import logging
+
 from django.db import models
+
+logger = logging.getLogger('hivesql')
 
 
 class HiveSQLManager(models.Manager):
@@ -71,7 +75,10 @@ class VoFillVestingWithdraw(models.Model):
         if self.withdrawn == 0:
             return 0
 
-        return (self.deposited / self.withdrawn / 1000) * 1000
+        logger.info(self.deposited)
+        logger.info(self.withdrawn)
+
+        return self.deposited * 10000 / self.withdrawn
 
     def __str__(self):
         return "{} - {}".format(self.ID, self.timestamp)
