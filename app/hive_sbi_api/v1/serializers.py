@@ -4,7 +4,8 @@ from hive_sbi_api.core.models import (Member,
                                       Transaction,
                                       Sponsee,
                                       Post,
-                                      Vote)
+                                      Vote,
+                                      MaxDailyHivePerMVest)
 
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -114,4 +115,15 @@ class PostSerializer(serializers.ModelSerializer):
             'hbd_rewards',
             'hive_power_rewards',
             'vote_set',
+        ]
+
+
+class MaxDailyHivePerMVestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MaxDailyHivePerMVest
+        fields = [
+            'timestamp',
+            'hivesql_id',
+            'block_num',
+            'hive_per_mvest',
         ]
