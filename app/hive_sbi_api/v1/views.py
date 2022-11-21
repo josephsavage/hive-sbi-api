@@ -10,13 +10,16 @@ from rest_framework.generics import get_object_or_404
 
 from hive_sbi_api.core.models import (Member,
                                       Transaction,
-                                      Post)
+                                      Post,
+                                      MaxDailyHivePerMVest)
 from .serializers import (MemberSerializer,
                           TransactionSerializer,
-                          PostSerializer)
+                          PostSerializer,
+                          MaxDailyHivePerMVestSerializer)
 
 from .filters import (TransactionFilter,
-                      PostFilter)
+                      PostFilter,
+                      MaxDailyHivePerMVestFilter)
 
 
 logger = logging.getLogger('v1')
@@ -101,4 +104,23 @@ class PostViewSet(ListModelMixin,
 
     ordering_fields = [
         'created',
+    ]
+
+
+class MaxDailyHivePerMVestViewSet(ListModelMixin,
+                                  RetrieveModelMixin,
+                                  GenericViewSet):
+
+    queryset = MaxDailyHivePerMVest.objects.all()
+    serializer_class = MaxDailyHivePerMVestSerializer
+
+    filter_backends = [
+        filters.DjangoFilterBackend,
+        OrderingFilter,
+    ]
+
+    filterset_class = MaxDailyHivePerMVestFilter
+
+    ordering_fields = [
+        'timestamp',
     ]

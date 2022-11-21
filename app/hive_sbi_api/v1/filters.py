@@ -1,7 +1,8 @@
 from django_filters import rest_framework as filters
 
 from hive_sbi_api.core.models import (Transaction,
-                                      Post)
+                                      Post,
+                                      MaxDailyHivePerMVest)
 
 
 class TransactionFilter(filters.FilterSet):
@@ -46,4 +47,12 @@ class PostFilter(filters.FilterSet):
         model = Post
         fields = (
             'author',
+        )
+
+
+class MaxDailyHivePerMVestFilter(filters.FilterSet):
+    class Meta:
+        model = MaxDailyHivePerMVest
+        fields = (
+            'timestamp',
         )
