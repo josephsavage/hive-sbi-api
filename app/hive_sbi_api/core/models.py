@@ -495,7 +495,7 @@ class Vote(models.Model):
         if not hive_per_mvest:
             return hive_per_mvest
 
-        return (self.post.author_rewards * 0.5 / hive_per_mvest) * (self.rshares / self.post.total_rshares) / 1000
+        return (self.post.author_rewards * 0.5 / hive_per_mvest) * (self.rshares / self.post.total_rshares)
 
     def __str__(self):
         return "{} - {}".format(
