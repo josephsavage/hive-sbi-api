@@ -71,7 +71,7 @@ class VoFillVestingWithdraw(models.Model):
         if self.withdrawn == 0:
             return 0
 
-        return self.deposited / (self.withdrawn / 1000)
+        return self.deposited / self.withdrawn
 
     def __str__(self):
         return "{} - {}".format(self.ID, self.timestamp)

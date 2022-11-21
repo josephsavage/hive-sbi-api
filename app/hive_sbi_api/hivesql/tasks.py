@@ -43,7 +43,11 @@ def set_max_vo_fill_vesting_withdrawn(self):
 
     init_date = last_registered_date + timedelta(days=1)
 
-    end_date = init_date + timedelta(days=500)
+    end_date = init_date + timedelta(days=30)
+    now = datetime.now()
+    if end_date > now():
+        end_date = now
+
     max_hive_per_mvests_for_create = []
     daterange = pd.date_range(init_date, end_date)
 
