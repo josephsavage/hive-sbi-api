@@ -45,7 +45,7 @@ def set_max_vo_fill_vesting_withdrawn(self):
 
     end_date = init_date + timedelta(days=30)
     now = datetime.now()
-    if end_date > now():
+    if end_date > now:
         end_date = now
 
     max_hive_per_mvests_for_create = []
