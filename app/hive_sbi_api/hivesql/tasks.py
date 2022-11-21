@@ -155,23 +155,29 @@ def sync_post_votes(self):
         last_sync_vote = Vote.objects.latest("time")
         last_sync_datetime = last_sync_vote.member_hist_datetime
 
-    timestamp_limit = datetime.now() - timedelta(days=7)
+    timestamp_limit = timezone.now() - timedelta(days=7)
     timestamp_limit = timestamp_limit.replace(tzinfo=pytz.UTC)
 
+    logger.info("timestamp_limit: {}".format(timestamp_limit))
+
     if last_sync_datetime:
+
+        logger.info("last_sync_datetime: {}".format(last_sync_datetime))
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__gt=last_sync_datetime,
             timestamp__lt=timestamp_limit,
-        )[:2000]
+        )[:50]
     else:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__lt=timestamp_limit,
-        )[:2000]
+        )[:50]
 
     new_posts_counter = 0
     votes_for_create = []
+
+    logger.info("1. member_hist_qr {}".format(member_hist_qr.count()))
 
     for member_hist in member_hist_qr:
         author = member_hist.author
@@ -184,7 +190,11 @@ def sync_post_votes(self):
             permlink=permlink,
         ).first()
 
+        if post:
+            logger.info("Post already exists: {} - {}".format(post.permlink, post.author))
+
         if not post:
+            logger.info("Creating post: {} - Author {}".format(member_hist.permlink, member_hist.author))
             new_posts_counter += 1
 
             hivesql_comment = HiveSQLComment.objects.filter(
