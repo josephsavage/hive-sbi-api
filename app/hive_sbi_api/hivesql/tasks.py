@@ -240,7 +240,7 @@ def sync_post_votes(self):
                         rshares=vote["rshares"],
                         percent=vote["percent"],
                         reputation=vote["reputation"],
-                        time=vote["time"].replace(tzinfo=pytz.UTC),
+                        time=datetime.strptime(vote["time"], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.UTC),
                         member_hist_datetime=member_hist_datetime,
                     ))
 
