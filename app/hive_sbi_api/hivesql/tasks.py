@@ -161,18 +161,17 @@ def sync_post_votes(self):
     logger.info("timestamp_limit: {}".format(timestamp_limit))
 
     if last_sync_datetime:
-
         logger.info("last_sync_datetime: {}".format(last_sync_datetime))
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__gt=last_sync_datetime,
             timestamp__lt=timestamp_limit,
-        )[:2500]
+        )[:3000]
     else:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__lt=timestamp_limit,
-        )[:2500]
+        )[:3000]
 
     new_posts_counter = 0
     votes_for_create = []
