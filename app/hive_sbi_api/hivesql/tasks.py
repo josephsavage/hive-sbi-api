@@ -29,7 +29,7 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute=30, hour='*/1'),
+        crontab(minute='*/45'),
         sync_post_votes.s(),
         name='sync_post_votes',
     )
@@ -194,7 +194,6 @@ def sync_post_votes(self):
             logger.info("Post already exists: {} - {}".format(post.permlink, post.author))
 
         if not post:
-            logger.info("Creating post: {} - Author {}".format(member_hist.permlink, member_hist.author))
             new_posts_counter += 1
 
             hivesql_comment = HiveSQLComment.objects.filter(
@@ -242,7 +241,7 @@ def sync_post_votes(self):
                         rshares=vote["rshares"],
                         percent=vote["percent"],
                         reputation=vote["reputation"],
-                        time=vote["time"],
+                        time=vote["time"].replace(tzinfo=pytz.UTC),
                         member_hist_datetime=member_hist_datetime,
                     ))
 
