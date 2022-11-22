@@ -231,7 +231,7 @@ def sync_post_votes(self):
                     if member_hist_vote:
                         member_hist_datetime = member_hist_vote.timestamp 
                     else:
-                        member_hist_datetime = timestamp
+                        member_hist_datetime = hivesql_comment.created
 
                     votes_for_create.append(Vote(
                         post=post,
