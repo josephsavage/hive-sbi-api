@@ -209,6 +209,12 @@ def sync_post_votes(self):
             if not hivesql_comment:
                 continue
 
+            if Post.objects.filter(
+                author=hivesql_comment.author,
+                permlink=hivesql_comment.permlink,
+            ).exists():
+                continue
+
             post = Post.objects.create(
                 author=hivesql_comment.author,
                 permlink=hivesql_comment.permlink,
