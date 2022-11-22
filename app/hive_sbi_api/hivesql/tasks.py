@@ -91,6 +91,19 @@ def set_max_vo_fill_vesting_withdrawn(self):
         end_date,
     )
 
+
+@app.task(bind=True)
+def clean_repeated_posts(self):
+    repeated = []
+    for p in Post.objects.all():
+        if Post.objects.filter(permlink=p.permlink, author=p.author).count() > 1:
+            repeated.append({"permlink": p.permlink, "author": p.author})
+
+    logger.debug("repeated -------------------------------------------- INIT")
+    logger.debug(repeated)
+    logger.debug("repeated -------------------------------------------- END")
+
+
 @app.task(bind=True)
 def sync_empty_votes_posts(self):
     empty_votes_posts = Post.objects.filter(
@@ -188,9 +201,6 @@ def sync_post_votes(self):
             author=author,
             permlink=permlink,
         ).first()
-
-        if post:
-            logger.info("Post already exists: {} - {}".format(post.permlink, post.author))
 
         if not post:
             new_posts_counter += 1
