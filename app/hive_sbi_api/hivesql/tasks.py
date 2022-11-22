@@ -93,14 +93,6 @@ def set_max_vo_fill_vesting_withdrawn(self):
 
 
 @app.task(bind=True)
-def clean_repeated_posts(self):
-    repeated = []
-    for p in Post.objects.all().reverse()[:3000]:
-        if Post.objects.filter(permlink=p.permlink, author=p.author).count() > 1:
-            p.delete()
-
-
-@app.task(bind=True)
 def sync_empty_votes_posts(self):
     empty_votes_posts = Post.objects.filter(
         vote=None,
@@ -124,7 +116,8 @@ def sync_empty_votes_posts(self):
                 if member_hist_vote:
                     member_hist_datetime = member_hist_vote.timestamp
                 else:
-                    member_hist_datetime = post.created
+                    vote_time = datetime.strptime(vote["time"], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.UTC)
+                    member_hist_datetime = vote_time - timedelta(minutes=1)
 
                 votes_for_create.append(Vote(
                     post=post,
@@ -161,13 +154,11 @@ def sync_post_votes(self):
     last_sync_datetime = None
 
     if Vote.objects.exists():
-        last_sync_vote = Vote.objects.latest("time")
+        last_sync_vote = Vote.objects.latest("member_hist_datetime")
         last_sync_datetime = last_sync_vote.member_hist_datetime
 
     timestamp_limit = timezone.now() - timedelta(days=7)
     timestamp_limit = timestamp_limit.replace(tzinfo=pytz.UTC)
-
-    logger.info("timestamp_limit: {}".format(timestamp_limit))
 
     if last_sync_datetime:
         logger.info("last_sync_datetime: {}".format(last_sync_datetime))
@@ -184,8 +175,6 @@ def sync_post_votes(self):
 
     new_posts_counter = 0
     votes_for_create = []
-
-    logger.info("1. member_hist_qr {}".format(member_hist_qr.count()))
 
     for member_hist in member_hist_qr:
         author = member_hist.author
@@ -240,17 +229,12 @@ def sync_post_votes(self):
                         voter=vote["voter"],
                     ).first()
 
-                    logger.info("--------------------------------------- INIT")
-                    logger.info(vote["time"])
+                    vote_time = datetime.strptime(vote["time"], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.UTC) 
 
                     if member_hist_vote:
-                        logger.info("YES")
                         member_hist_datetime = member_hist_vote.timestamp 
                     else:
-                        member_hist_datetime = hivesql_comment.created
-
-                    logger.info(member_hist_datetime)
-                    logger.info("-------------------------------------- END")
+                        member_hist_datetime = vote_time - timedelta(minutes=1)
 
                     votes_for_create.append(Vote(
                         post=post,
@@ -259,8 +243,8 @@ def sync_post_votes(self):
                         rshares=vote["rshares"],
                         percent=vote["percent"],
                         reputation=vote["reputation"],
-                        time=datetime.strptime(vote["time"], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.UTC),
-                        member_hist_datetime=hivesql_comment.created,
+                        time=vote_time,
+                        member_hist_datetime=member_hist_datetime,
                     ))
 
             post.total_rshares = total_rshares
