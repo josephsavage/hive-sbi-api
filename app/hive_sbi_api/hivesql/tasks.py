@@ -95,7 +95,7 @@ def set_max_vo_fill_vesting_withdrawn(self):
 @app.task(bind=True)
 def clean_repeated_posts(self):
     repeated = []
-    for p in Post.objects.all().reverse()[:2000]:
+    for p in Post.objects.all().reverse()[:3000]:
         if Post.objects.filter(permlink=p.permlink, author=p.author).count() > 1:
             p.delete()
 
@@ -175,12 +175,12 @@ def sync_post_votes(self):
             voter__in=VOTER_ACCOUNTS,
             timestamp__gt=last_sync_datetime,
             timestamp__lt=timestamp_limit,
-        )[:3500]
+        )[:3600]
     else:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__lt=timestamp_limit,
-        )[:3500]
+        )[:3600]
 
     new_posts_counter = 0
     votes_for_create = []
@@ -254,7 +254,7 @@ def sync_post_votes(self):
                         percent=vote["percent"],
                         reputation=vote["reputation"],
                         time=datetime.strptime(vote["time"], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.UTC),
-                        member_hist_datetime=member_hist_datetime,
+                        member_hist_datetime=hivesql_comment.created,
                     ))
 
             post.total_rshares = total_rshares
