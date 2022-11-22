@@ -182,12 +182,13 @@ class PostAdmin(admin.ModelAdmin):
 class VoteAdmin(admin.ModelAdmin):
     list_display = (
         'voter',
+        'time',
+        'member_hist_datetime',
         'post',
         'weight',
         'rshares',
         'percent',
         'reputation',
-        'time',
     )
 
     search_fields = ['post__author', 'post__permlink', 'post__title']
@@ -205,7 +206,6 @@ class VoteAdmin(admin.ModelAdmin):
         'reputation',
         'post',
         #'time',
-        #'member_hist_datetime',
     ]
 
 
