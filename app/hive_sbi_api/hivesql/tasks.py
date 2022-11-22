@@ -166,12 +166,12 @@ def sync_post_votes(self):
             voter__in=VOTER_ACCOUNTS,
             timestamp__gt=last_sync_datetime,
             timestamp__lt=timestamp_limit,
-        )[:3100]
+        )[:3500]
     else:
         member_hist_qr = MemberHist.objects.filter(
             voter__in=VOTER_ACCOUNTS,
             timestamp__lt=timestamp_limit,
-        )[:3100]
+        )[:3500]
 
     new_posts_counter = 0
     votes_for_create = []
@@ -228,10 +228,17 @@ def sync_post_votes(self):
                         voter=vote["voter"],
                     ).first()
 
+                    logger.info("--------------------------------------- INIT")
+                    logger.info(vote["time"])
+
                     if member_hist_vote:
+                        logger.info("YES")
                         member_hist_datetime = member_hist_vote.timestamp 
                     else:
                         member_hist_datetime = hivesql_comment.created
+
+                    logger.info(member_hist_datetime)
+                    logger.info("-------------------------------------- END")
 
                     votes_for_create.append(Vote(
                         post=post,
