@@ -95,7 +95,7 @@ def set_max_vo_fill_vesting_withdrawn(self):
 @app.task(bind=True)
 def clean_repeated_posts(self):
     repeated = []
-    for p in Post.objects.all().reverse()[:200]:
+    for p in Post.objects.all().reverse()[:2000]:
         if Post.objects.filter(permlink=p.permlink, author=p.author).count() > 1:
             p.delete()
 
