@@ -34,6 +34,12 @@ def setup_periodic_tasks(sender, **kwargs):
         name='sync_post_votes',
     )
 
+    sender.add_periodic_task(
+        crontab(minute=0, hour=11),
+        set_max_vo_fill_vesting_withdrawn.s(),
+        name='set_max_vo_fill_vesting_withdrawn',
+    )
+
 
 @app.task(bind=True)
 def set_max_vo_fill_vesting_withdrawn(self):
@@ -46,7 +52,8 @@ def set_max_vo_fill_vesting_withdrawn(self):
     init_date = last_registered_date + timedelta(days=1)
 
     end_date = init_date + timedelta(days=30)
-    now = timezone.now()
+    now = timezone.now() - timedelta(days=1)
+
     if end_date > now:
         end_date = now
 
@@ -252,6 +259,5 @@ def sync_post_votes(self):
 
     Vote.objects.bulk_create(votes_for_create)
     sync_empty_votes_posts.delay()
-    set_max_vo_fill_vesting_withdrawn.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))
