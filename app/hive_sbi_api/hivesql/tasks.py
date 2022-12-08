@@ -13,9 +13,11 @@ from celery.schedules import crontab
 
 from django.utils import timezone
 
-from hive_sbi_api.core.models import (Post,
+from hive_sbi_api.core.models import (Member,
+                                      Post,
                                       Vote,
-                                      MaxDailyHivePerMVest)
+                                      MaxDailyHivePerMVest,
+                                      LastSyncOlderPostOriginalEnrollment)
 from hive_sbi_api.sbi.models import MemberHist
 from hive_sbi_api.sbi.data import VOTER_ACCOUNTS
 from hive_sbi_api.hivesql.models import (HiveSQLComment,
@@ -29,7 +31,7 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute='*/45'),
+        crontab(hour='*/4'),
         sync_post_votes.s(),
         name='sync_post_votes',
     )
@@ -261,3 +263,31 @@ def sync_post_votes(self):
     sync_empty_votes_posts.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))
+
+
+@app.task(bind=True)
+def sync_older_posts(self):
+    if LastSyncOlderPostOriginalEnrollment.objects.count():
+        min_limit = LastSyncOlderPostOriginalEnrollment.objects.first().original_enrollment
+    else:
+        min_limit = Member.objects.all().order_by("original_enrollment").first().original_enrollment
+
+        LastSyncOlderPostOriginalEnrollment.objects.create(
+            original_enrollment=min_limit,
+        )
+
+    max_limit = Post.objects.get(
+        author="mango-juice",
+        permlink="my-daily-steemmonsters-report-73"
+    ).created 
+
+    older_members = Member.objects.filter(
+        original_enrollment__gte=min_limit,
+        original_enrollment__lt=max_limit,
+    ).order_by("original_enrollment")[:10]
+
+    # TODO: Remember to update LastSyncOlderPostOriginalEnrollment
+    for older_members in older_members:
+        print(older_members.account)
+
+    return older_members
