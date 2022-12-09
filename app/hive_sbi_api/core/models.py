@@ -533,3 +533,7 @@ class MaxDailyHivePerMVest(models.Model):
         verbose_name = 'maximum daily Hive per mvest'
         verbose_name_plural = 'maximum daily Hive per mvest'
         ordering  = ['timestamp']
+
+
+class LastSyncOlderPostOriginalEnrollment(models.Model):
+    original_enrollment = models.DateTimeField()
