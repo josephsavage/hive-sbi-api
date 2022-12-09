@@ -31,7 +31,7 @@ app = current_app._get_current_object()
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour='*/4'),
+        crontab(minute='*/45'),
         sync_post_votes.s(),
         name='sync_post_votes',
     )
@@ -157,6 +157,112 @@ def sync_empty_votes_posts(self):
 
 
 @app.task(bind=True)
+def sync_older_posts(self):
+    if LastSyncOlderPostOriginalEnrollment.objects.count():
+        min_limit = LastSyncOlderPostOriginalEnrollment.objects.first().original_enrollment
+    else:
+        min_limit = Member.objects.all().order_by("original_enrollment").first().original_enrollment
+
+        LastSyncOlderPostOriginalEnrollment.objects.create(
+            original_enrollment=min_limit,
+        )
+
+    max_limit = Post.objects.get(
+        author="mango-juice",
+        permlink="my-daily-steemmonsters-report-73"
+    ).created
+
+    older_members = Member.objects.filter(
+        original_enrollment__gte=min_limit,
+        original_enrollment__lt=max_limit,
+    ).order_by("original_enrollment")[:200]
+
+    if not older_members:
+        return "REMOVE ME!!! My work is finished."
+
+    new_posts_counter = 0
+    votes_for_create = []
+    synchronized_users = []
+
+    for older_member in older_members:
+        synchronized_users.append(older_member.account)
+
+        hivesql_comments = HiveSQLComment.objects.filter(
+            author=older_member.account,
+            created__gt=min_limit - timedelta(days=7),
+            created__lt=max_limit,
+        )
+
+        for hivesql_comment in hivesql_comments:
+            if Post.objects.filter(
+                author=hivesql_comment.author,
+                permlink=hivesql_comment.permlink,
+            ).exists():
+                continue
+
+            active_votes = hivesql_comment.active_votes
+            create_post = False
+
+            for vote in active_votes:
+                if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(
+                    post__permlink=hivesql_comment.permlink,
+                    post__author=hivesql_comment.author,
+                    voter=vote["voter"],
+                ):
+                    create_post = True
+                    break
+
+            if not create_post:
+                continue
+
+            post = Post.objects.create(
+                author=hivesql_comment.author,
+                permlink=hivesql_comment.permlink,
+                title=hivesql_comment.title,
+                created=hivesql_comment.created,
+                vote_rshares=hivesql_comment.vote_rshares,
+                total_payout_value=hivesql_comment.total_payout_value,
+                author_rewards=hivesql_comment.author_rewards,
+                active_votes=hivesql_comment.active_votes,
+                total_rshares=0,
+            )
+
+            new_posts_counter += 1
+            total_rshares = 0
+
+            for vote in post.active_votes:
+                total_rshares = total_rshares + int(vote["rshares"])
+
+                if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(post=post, voter=vote["voter"]):
+                    vote_time = datetime.strptime(vote["time"], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.UTC)
+                    member_hist_datetime = vote_time - timedelta(minutes=1)
+
+                    votes_for_create.append(Vote(
+                        post=post,
+                        voter=vote["voter"],
+                        weight=vote["weight"],
+                        rshares=vote["rshares"],
+                        percent=vote["percent"],
+                        reputation=vote["reputation"],
+                        time=vote_time,
+                        member_hist_datetime=member_hist_datetime,
+                    ))
+
+
+
+            post.total_rshares = total_rshares
+            post.save()
+
+            last_register = LastSyncOlderPostOriginalEnrollment.objects.first()
+            last_register.original_enrollment = older_member.original_enrollment
+            last_register.save()
+
+    Vote.objects.bulk_create(votes_for_create)
+
+    return "Created {} posts and {} votes for {}".format(new_posts_counter, len(votes_for_create), synchronized_users)
+
+
+@app.task(bind=True)
 def sync_post_votes(self):
     logger.info("Initializing votes sync")
 
@@ -261,33 +367,6 @@ def sync_post_votes(self):
 
     Vote.objects.bulk_create(votes_for_create)
     sync_empty_votes_posts.delay()
+    sync_older_posts.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))
-
-
-@app.task(bind=True)
-def sync_older_posts(self):
-    if LastSyncOlderPostOriginalEnrollment.objects.count():
-        min_limit = LastSyncOlderPostOriginalEnrollment.objects.first().original_enrollment
-    else:
-        min_limit = Member.objects.all().order_by("original_enrollment").first().original_enrollment
-
-        LastSyncOlderPostOriginalEnrollment.objects.create(
-            original_enrollment=min_limit,
-        )
-
-    max_limit = Post.objects.get(
-        author="mango-juice",
-        permlink="my-daily-steemmonsters-report-73"
-    ).created 
-
-    older_members = Member.objects.filter(
-        original_enrollment__gte=min_limit,
-        original_enrollment__lt=max_limit,
-    ).order_by("original_enrollment")[:10]
-
-    # TODO: Remember to update LastSyncOlderPostOriginalEnrollment
-    for older_members in older_members:
-        print(older_members.account)
-
-    return older_members
