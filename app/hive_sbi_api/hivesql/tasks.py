@@ -240,9 +240,7 @@ def sync_older_posts(self):
             last_register.original_enrollment = older_member.original_enrollment
             last_register.save()
 
-    Vote.objects.bulk_create(votes_for_create)
-
-    return "Created {} posts and {} votes for {}".format(new_posts_counter, len(votes_for_create), synchronized_users)
+    return "Created {} posts for {}".format(new_posts_counter, synchronized_users)
 
 
 @app.task(bind=True)
