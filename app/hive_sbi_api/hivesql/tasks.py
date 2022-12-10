@@ -100,7 +100,7 @@ def sync_empty_votes_posts(self):
     empty_votes_posts = Post.objects.filter(
         vote=None,
         empty_votes=False,
-    )[:300]
+    )[:800]
 
     empty_votes_posts_counter = 0
     synchronized_posts = 0
