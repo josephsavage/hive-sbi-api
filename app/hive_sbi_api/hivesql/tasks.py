@@ -185,6 +185,7 @@ def sync_older_posts(self):
     synchronized_users = []
 
     for older_member in older_members:
+        logger.info("----------------")
         synchronized_users.append(older_member.account)
 
         hivesql_comments = HiveSQLComment.objects.filter(
@@ -200,6 +201,7 @@ def sync_older_posts(self):
             ).exists():
                 continue
 
+            logger.info("{} - {}".format(older_member.account, hivesql_comment.permlink))
             active_votes = hivesql_comment.active_votes
             create_post = False
 
