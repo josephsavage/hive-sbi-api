@@ -100,15 +100,18 @@ def sync_empty_votes_posts(self):
     empty_votes_posts = Post.objects.filter(
         vote=None,
         empty_votes=False,
-    )[:50]
+    )[:300]
 
     empty_votes_posts_counter = 0
     synchronized_posts = 0
 
     for post in empty_votes_posts:
         votes_for_create = []
+        total_rshares = 0
 
         for vote in post.active_votes:
+            total_rshares = total_rshares + int(vote["rshares"])
+
             if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(post=post, voter=vote["voter"]):
                 member_hist_vote = MemberHist.objects.filter(
                     author=post.author,
@@ -141,12 +144,16 @@ def sync_empty_votes_posts(self):
 
             continue
 
+        post.total_rshares = total_rshares
+        post.save()
+
         Vote.objects.bulk_create(votes_for_create)
         synchronized_posts += 1
 
-    return "Found {} posts without votes. {} posts synchronized.".format(
+    return "Found {} posts without votes. {} posts synchronized. {} Votes Created.".format(
         empty_votes_posts_counter,
         synchronized_posts,
+        len(votes_for_create),
     )
 
 
@@ -169,13 +176,12 @@ def sync_older_posts(self):
     older_members = Member.objects.filter(
         original_enrollment__gte=min_limit,
         original_enrollment__lt=max_limit,
-    ).order_by("original_enrollment")[:50]
+    ).order_by("original_enrollment")[:100]
 
     if not older_members:
         return "REMOVE ME!!! My work is finished."
 
     new_posts_counter = 0
-    votes_for_create = []
     synchronized_users = []
 
     for older_member in older_members:
@@ -227,23 +233,6 @@ def sync_older_posts(self):
             for vote in post.active_votes:
                 total_rshares = total_rshares + int(vote["rshares"])
 
-                if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(post=post, voter=vote["voter"]):
-                    vote_time = datetime.strptime(vote["time"], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.UTC)
-                    member_hist_datetime = vote_time - timedelta(minutes=1)
-
-                    votes_for_create.append(Vote(
-                        post=post,
-                        voter=vote["voter"],
-                        weight=vote["weight"],
-                        rshares=vote["rshares"],
-                        percent=vote["percent"],
-                        reputation=vote["reputation"],
-                        time=vote_time,
-                        member_hist_datetime=member_hist_datetime,
-                    ))
-
-
-
             post.total_rshares = total_rshares
             post.save()
 
@@ -251,9 +240,7 @@ def sync_older_posts(self):
             last_register.original_enrollment = older_member.original_enrollment
             last_register.save()
 
-    Vote.objects.bulk_create(votes_for_create)
-
-    return "Created {} posts and {} votes for {}".format(new_posts_counter, len(votes_for_create), synchronized_users)
+    return "Created {} posts for {}".format(new_posts_counter, synchronized_users)
 
 
 @app.task(bind=True)
@@ -360,7 +347,7 @@ def sync_post_votes(self):
             post.save()
 
     Vote.objects.bulk_create(votes_for_create)
-    #sync_empty_votes_posts.delay()
-    #sync_older_posts.delay()
+    sync_older_posts.delay()
+    sync_empty_votes_posts.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))
