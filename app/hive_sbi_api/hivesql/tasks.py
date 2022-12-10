@@ -169,7 +169,7 @@ def sync_older_posts(self):
     older_members = Member.objects.filter(
         original_enrollment__gte=min_limit,
         original_enrollment__lt=max_limit,
-    ).order_by("original_enrollment")[:200]
+    ).order_by("original_enrollment")[:50]
 
     if not older_members:
         return "REMOVE ME!!! My work is finished."
@@ -361,6 +361,6 @@ def sync_post_votes(self):
 
     Vote.objects.bulk_create(votes_for_create)
     sync_empty_votes_posts.delay()
-    sync_older_posts.delay()
+    #sync_older_posts.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))
