@@ -129,7 +129,7 @@ def sync_empty_votes_posts(self):
                     rshares=vote["rshares"],
                     percent=vote["percent"],
                     reputation=vote["reputation"],
-                    time=vote["time"],
+                    time=vote_time,
                     member_hist_datetime=member_hist_datetime,
                 ))
 
