@@ -56,6 +56,7 @@ class HiveSQLTxVotes(models.Model):
     class Meta:
         managed = False
         db_table = 'TxVotes'
+        ordering  = ['timestamp']
 
 
 class VoFillVestingWithdraw(models.Model):
