@@ -37,6 +37,12 @@ def setup_periodic_tasks(sender, **kwargs):
         name='set_max_vo_fill_vesting_withdrawn',
     )
 
+    sender.add_periodic_task(
+        crontab(minute='*/45',),
+        sync_older_posts_from_votes.s(),
+        name='sync_older_posts_from_votes',
+    )
+
 
 @app.task(bind=True)
 def set_max_vo_fill_vesting_withdrawn(self):
@@ -180,7 +186,7 @@ def sync_older_posts_from_votes(self):
         voter__in=VOTER_ACCOUNTS,
         timestamp__gt=min_limit,
         timestamp__lt=max_limit,
-    )[:2000]
+    )[:3000]
 
     if not votes:
         return "REMOVE ME!!! My work is finished."
@@ -337,7 +343,6 @@ def sync_post_votes(self):
             post.save()
 
     Vote.objects.bulk_create(votes_for_create)
-    sync_older_posts_from_votes.delay()
     sync_empty_votes_posts.delay()
 
     return "Created {} posts and {} votes".format(new_posts_counter, len(votes_for_create))
