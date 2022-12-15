@@ -229,7 +229,7 @@ def sync_older_posts_from_votes(self):
     last_register.original_enrollment = new_min_timestamp
     last_register.save()
 
-    return "{} already registered posts. {} posts created. New min timestamp = ".format(
+    return "{} already registered posts. {} posts created. New min timestamp = {}".format(
         already_registered_post_counter, created_post_counter, new_min_timestamp)
 
 
