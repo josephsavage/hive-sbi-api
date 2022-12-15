@@ -202,7 +202,7 @@ def sync_older_posts_from_votes(self):
 
         hivesql_comment = HiveSQLComment.objects.filter(
             author=vote.author,
-            permilink=vote.permlink,
+            permlink=vote.permlink,
         ).first()
 
         logger.info("---------------------------------------------")
