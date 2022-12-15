@@ -206,8 +206,8 @@ def sync_older_posts_from_votes(self):
         ).first()
 
         logger.info("---------------------------------------------")
-        logger.info(author)
-        logger.info(permlink)
+        logger.info(vote.author)
+        logger.info(vote.permlink)
         logger.info("---------------------------------------------")
 
         Post.objects.create(
