@@ -150,10 +150,9 @@ def sync_empty_votes_posts(self):
         Vote.objects.bulk_create(votes_for_create)
         synchronized_posts += 1
 
-    return "Found {} posts without votes. {} posts synchronized. {} Votes Created.".format(
+    return "Found {} posts without votes. {} posts synchronized.".format(
         empty_votes_posts_counter,
         synchronized_posts,
-        len(votes_for_create),
     )
 
 
