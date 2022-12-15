@@ -180,7 +180,7 @@ def sync_older_posts_from_votes(self):
         voter__in=VOTER_ACCOUNTS,
         timestamp__gt=min_limit,
         timestamp__lt=max_limit,
-    )[:50]
+    )[:2000]
 
     if not votes:
         return "REMOVE ME!!! My work is finished."
