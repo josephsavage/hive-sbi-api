@@ -216,6 +216,9 @@ def sync_older_posts_from_votes(self):
         logger.info(vote.permlink)
         logger.info("---------------------------------------------")
 
+        if not hivesql_comment:
+            continue
+
         Post.objects.create(
             author=hivesql_comment.author,
             permlink=hivesql_comment.permlink,
