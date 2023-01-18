@@ -89,8 +89,8 @@ class TransactionViewSet(ListModelMixin,
 
 
 class PostViewSet(ListModelMixin,
-                         RetrieveModelMixin,
-                         GenericViewSet):
+                  RetrieveModelMixin,
+                  GenericViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer

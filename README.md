@@ -99,4 +99,12 @@ The synchronization function, named `sync_members`, is defnined in the [tasks.py
 
 # API docs
 
-API documentation is generated with Swagger and is available in https://api.hivesbi.com/docs/.
+This applications supports the first API version available in https://api.steembasicincome.com. Here it is known as API-V0 (Version 0), and supports one endpoint to get members information with a GET request to https://api.hivesbi.com/users/{member-username}/.
+
+Also included here the new API version, or API-V1, available in https://api.hivesbi.com/v1/. It has a browsable API developed with Django Rest Framework.
+
+Swagger documentation is available in https://api.hivesbi.com/docs/.
+
+
+- [V0 Documentation](README.V0.md)
+- [V1 Documentation](README.V1.md)
