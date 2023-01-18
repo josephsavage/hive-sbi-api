@@ -5,6 +5,7 @@ V1 browsable API is available in https://api.hivesbi.com/v1/. Supports 4 differe
 
 # Members
 
+
 ### List
 
 GET request to the https://api.hivesbi.com/v1/members/ endpoint. Returns paginated list of members, with 200 items per page.
@@ -96,7 +97,7 @@ Response content includes the total members count, the link to the next page, an
     ]
 ~~~
 
-The list verb supports diferent ordering filters. Ordering filters can be ascending or descending. To set a descending ordering filter, just add a "-" symbol at the begining of the filter key. To use an ordering filter, just add it as a url parameter as shown below:
+The "list" endpoint supports diferent ordering filters. Ordering filters can be ascending or descending. To set a descending ordering filter, just add a "-" symbol at the begining of the filter key. To use an ordering filter, just add it as a url parameter as shown below:
 
 Ascending ordering:
 
@@ -123,11 +124,11 @@ Supported ordering filters are:
 
 ### Retrieve
 
-GET request to the https://api.hivesbi.com/v1/members/{username}/ endpoint.
+Retrieve specific member detail. GET Request to the https://api.hivesbi.com/v1/members/{username}/ endpoint.
 
 #### Example:
 
-Browasable api for member with username [ecoinstant](https://api.hivesbi.com/v1/members/ecoinstant/)
+Browasable api for member with username [ecoinstant](https://api.hivesbi.com/v1/members/ecoinstant/).
 
 ~~~
 $ curl https://api.hivesbi.com/users/ecoinstant/
@@ -170,3 +171,81 @@ Response content:
     "next_upvote_estimate": 90.0183210748361
 }
 ~~~
+
+# Transactions
+
+### List
+
+GET request to the https://api.hivesbi.com/v1/transactions/ endpoint. Returns paginated list of transactions, with 200 items per page.
+
+#### Example
+
+~~~
+$ curl https://api.hivesbi.com/v1/transactions/
+~~~
+
+Response content includes the total transactions count, the link to the next page, and the link to the previous page. A list called "results" cointains the 200 transactions for the page.
+
+~~~
+{
+    "count": 70500,
+    "next": "http://api.hivesbi.com/v1/transactions/?limit=200&offset=200",
+    "previous": null,
+    "results": [
+        {
+            "index": 1163875,
+            "source": "steembasicincome",
+            "memo": "'@trucklife-family'",
+            "account": "tengolotodo",
+            "sponsor": "tengolotodo",
+            "sponsees": [
+                {
+                    "account": "trucklife-family",
+                    "units": 1
+                }
+            ],
+            "shares": 1,
+            "vests": 0.0,
+            "timestamp": "2023-01-18T16:40:21Z",
+            "status": "Valid",
+            "share_type": "Standard"
+        },
+        {
+            "index": 1163845,
+            "source": "steembasicincome",
+            "memo": "'yeckingo1'",
+            "account": "ecoinstats",
+            "sponsor": "ecoinstats",
+            "sponsees": [
+                {
+                    "account": "yeckingo1",
+                    "units": 1
+                }
+            ],
+            "shares": 1,
+            "vests": 0.0,
+            "timestamp": "2023-01-18T14:29:09Z",
+            "status": "Valid",
+            "share_type": "Standard"
+        },
+        ...
+        ...
+        ...
+    ]
+}
+~~~
+
+Results can be filtered by different fields. Supported filters are:
+
+- source
+- account
+- sponsor
+- status
+- share_type
+- sponsee
+
+
+To use filter, add these as GET parameters in the url (take a look to the 'Filters' button in the browsable API to test them), as shown below:
+
+https://api.hivesbi.com/v1/transactions/?source=steembasicincome&account=ecoinstant
+
