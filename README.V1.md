@@ -1,7 +1,8 @@
 API V1
 ======
 
-V1 browsable API is available in https://api.hivesbi.com/v1/. Supports 4 different endpoints:
+- V1 browsable API is available in https://api.hivesbi.com/v1/. Supports 4 different endpoints.
+- Go to Swagger documentation page https://api.hivesbi.com/docs/ to inspect interactive docs.
 
 # Members
 
@@ -383,7 +384,13 @@ Response content includes the total hive per mvest count, the link to the next p
 }
 ~~~
 
-It is possible to get the value for a specific day adding the "timestamp" filter as url parameter:
+It is possible to get the value for a specific date adding the "date" filter as url parameter:
+
+https://api.hivesbi.com/v1/hive-per-mvest/?date=2022-01-01
+
+Also, it is possible to filter by a dates range:
+
+https://api.hivesbi.com/v1/hive-per-mvest/?date=&start_date=2022-01-01&end_date=2022-01-03
 
 
 Ordered filtering by the "timestamp" field is supported:
