@@ -51,8 +51,28 @@ class PostFilter(filters.FilterSet):
 
 
 class MaxDailyHivePerMVestFilter(filters.FilterSet):
+    date = filters.DateFilter(
+        field_name='timestamp',
+        lookup_expr="istartswith",
+        label='date',
+    )
+
+    start_date = filters.DateFilter(
+        field_name='timestamp',
+        lookup_expr="gte",
+        label='start date',
+    )
+
+    end_date = filters.DateFilter(
+        field_name='timestamp',
+        lookup_expr="lte",
+        label='end date',
+    )
+
     class Meta:
         model = MaxDailyHivePerMVest
         fields = (
-            'timestamp',
+            'date',
+            'start_date',
+            'end_date',
         )
