@@ -3,13 +3,13 @@ API V1
 
 V1 browsable API is available in https://api.hivesbi.com/v1/. Supports 4 different endpoints:
 
-## Members
+# Members
 
-## List
+### List
 
 GET request to the https://api.hivesbi.com/v1/members/ endpoint. Returns paginated list of members, with 200 items per page.
 
-### Example
+#### Example
 
 ~~~
 $ curl https://api.hivesbi.com/v1/members/
@@ -108,4 +108,65 @@ descending ordering:
 
 ~~~
 https://api.hivesbi.com/v1/members/?ordering=-<filter-key>
+~~~
+
+Supported ordering filters are:
+
+- total_shares
+- shares
+- bonus_shares
+- estimate_rewarded
+- pending_balance
+- next_upvote_estimate
+- total_rshares
+
+
+### Retrieve
+
+GET request to the https://api.hivesbi.com/v1/members/{username}/ endpoint.
+
+#### Example:
+
+Browasable api for member with username [ecoinstant](https://api.hivesbi.com/v1/members/ecoinstant/)
+
+~~~
+$ curl https://api.hivesbi.com/users/ecoinstant/
+~~~
+
+Response content:
+
+~~~
+{
+    "account": "ecoinstant",
+    "note": null,
+    "shares": 11513,
+    "bonus_shares": 875,
+    "total_shares": 12388,
+    "total_share_days": 9786562,
+    "avg_share_age": 790.003,
+    "last_comment": "2023-01-13T02:04:45Z",
+    "last_post": "2023-01-09T20:54:30Z",
+    "original_enrollment": "2017-12-12T17:46:54Z",
+    "latest_enrollment": "2023-01-13T19:31:42Z",
+    "flags": null,
+    "earned_rshares": 6067582069624312,
+    "subscribed_rshares": 5378399146490044,
+    "curation_rshares": 34423069679682,
+    "delegation_rshares": 654759853454600,
+    "other_rshares": 12078245728126,
+    "rewarded_rshares": 4849690081313447,
+    "total_rshares": 5493007166275010,
+    "estimate_rewarded": 2035.82791002297,
+    "balance_rshares": 643317084961563,
+    "upvote_delay": 300.0,
+    "updated_at": "2023-01-13T02:04:45Z",
+    "first_cycle_at": "2018-12-13T18:57:26Z",
+    "last_received_vote": "2022-12-27T15:33:42Z",
+    "blacklisted": null,
+    "hivewatchers": false,
+    "buildawhale": false,
+    "skiplist": false,
+    "pending_balance": 270.054963224508,
+    "next_upvote_estimate": 90.0183210748361
+}
 ~~~
