@@ -250,7 +250,7 @@ To use filter, add these as GET parameters in the url (take a look to the 'Filte
 https://api.hivesbi.com/v1/transactions/?source=steembasicincome&account=ecoinstant
 
 
-# Posst
+# Posts
 
 ### List
 
@@ -332,7 +332,7 @@ Results can be filtered by the author field:
 
 https://api.hivesbi.com/v1/posts/?author=ecoinstant
 
-Also ordering filters by the "created" field is supported:
+Also ordered filtering by the "created" field is supported:
 
 Ascending:
 
@@ -342,3 +342,56 @@ Descending:
 
 https://api.hivesbi.com/v1/posts/?author=ecoinstant&ordering=-created
 
+
+# Hive per mvest
+
+### List
+
+GET request to the https://api.hivesbi.com/v1/hive-per-mvest/ endpoint. Returns paginated list of maximum daily hive per mvest, with 200 items per page.
+
+
+#### Example
+
+~~~
+$ curl https://api.hivesbi.com/v1/hive-per-mvest/
+~~~
+
+Response content includes the total hive per mvest count, the link to the next page, and the link to the previous page. A list called "results" cointains the 200 hive per mvest for the page.
+
+~~~
+{
+    "count": 2473,
+    "next": "http://api.hivesbi.com/v1/hive-per-mvest/?limit=200&offset=200",
+    "previous": null,
+    "results": [
+        {
+            "timestamp": "2016-04-10T13:45:45Z",
+            "hivesql_id": 3,
+            "block_num": 479660,
+            "hive_per_mvest": 26817752596.7894
+        },
+        {
+            "timestamp": "2016-04-11T13:45:45Z",
+            "hivesql_id": null,
+            "block_num": null,
+            "hive_per_mvest": null
+        },
+        ...
+        ...
+        ...
+    ],
+}
+~~~
+
+It is possible to get the value for a specific day adding the "timestamp" filter as url parameter:
+
+
+Ordered filtering by the "timestamp" field is supported:
+
+Ascending:
+
+https://api.hivesbi.com/v1/hive-per-mvest/?ordering=timestamp
+
+Descending:
+
+https://api.hivesbi.com/v1/hive-per-mvest/?ordering=-timestamp
