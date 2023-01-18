@@ -104,3 +104,7 @@ This applications supports the first API version available in https://api.steemb
 Also included here the new API version, or API-V1, available in https://api.hivesbi.com/v1/. It has a browsable API developed with Django Rest Framework.
 
 Swagger documentation is available in https://api.hivesbi.com/docs/.
+
+
+- [V0 Documentation](README.V0.md)
+
