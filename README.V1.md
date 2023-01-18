@@ -249,3 +249,96 @@ To use filter, add these as GET parameters in the url (take a look to the 'Filte
 
 https://api.hivesbi.com/v1/transactions/?source=steembasicincome&account=ecoinstant
 
+
+# Posst
+
+### List
+
+GET request to the https://api.hivesbi.com/v1/posts/ endpoint. Returns paginated list of posts voted by the SBI accounts, with 200 items per page.
+
+
+#### Example
+
+~~~
+$ curl https://api.hivesbi.com/v1/posts/
+~~~
+
+Response content includes the total posts count, the link to the next page, and the link to the previous page. A list called "results" cointains the 200 posts for the page.
+
+~~~
+{
+    "count": 1351205,
+    "next": "http://api.hivesbi.com/v1/posts/?limit=200&offset=200",
+    "previous": null,
+    "results": [
+        {
+            "id": 817924,
+            "author": "silviabeneforti",
+            "permlink": "woman-at-work-",
+            "title": "Woman at work ^_^",
+            "created": "2017-06-18T16:21:51Z",
+            "vote_rshares": 0,
+            "total_payout_value": 70.34,
+            "author_rewards": 33180.0,
+            "total_rshares": 4068132030358,
+            "hbd_rewards": 0.0,
+            "hive_power_rewards": 0.0,
+            "vote_set": [
+                {
+                    "voter": "sbi6",
+                    "weight": 0,
+                    "rshares": 0,
+                    "percent": 100,
+                    "reputation": 3375990420,
+                    "time": "2018-07-09T19:50:42Z",
+                    "hbd_rewards": 0.0,
+                    "hive_power_rewards": 0.0
+                }
+            ]
+        },
+        {
+            "id": 664209,
+            "author": "nokodemion",
+            "permlink": "the-attribution-problem-in-cyber-attacks",
+            "title": "The Attribution Problem in Cyber Attacks",
+            "created": "2017-11-10T18:59:15Z",
+            "vote_rshares": 6312223497,
+            "total_payout_value": 0.0,
+            "author_rewards": 0.0,
+            "total_rshares": 6312223497,
+            "hbd_rewards": 0.0,
+            "hive_power_rewards": 0.0,
+            "vote_set": [
+                {
+                    "voter": "steembasicincome",
+                    "weight": 386,
+                    "rshares": 50614054,
+                    "percent": 100,
+                    "reputation": 0,
+                    "time": "2017-11-17T01:11:33Z",
+                    "hbd_rewards": 0.0,
+                    "hive_power_rewards": 0.0
+                }
+            ]
+        },
+        ...
+        ...
+        ...
+    ]
+}
+~~~
+
+Results can be filtered by the author field:
+
+https://api.hivesbi.com/v1/posts/?author=ecoinstant
+
+Also ordering filters by the "created" field is supported:
+
+Ascending:
+
+https://api.hivesbi.com/v1/posts/?author=ecoinstant&ordering=created
+
+Descending:
+
+https://api.hivesbi.com/v1/posts/?author=ecoinstant&ordering=-created
+
