@@ -107,4 +107,4 @@ Swagger documentation is available in https://api.hivesbi.com/docs/.
 
 
 - [V0 Documentation](README.V0.md)
-
+- [V1 Documentation](README.V1.md)

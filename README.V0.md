@@ -5,16 +5,14 @@ V0 supports only one endpoint to get members information. Clients must send a ge
 
 ### Example:
 
+
+Browasable api for member with username [ecoinstant](https://api.hivesbi.com/users/ecoinstant/)
+
 ~~~
 $ curl https://api.hivesbi.com/users/ecoinstant/
 ~~~
 
-Response:
-
-HTTP 200 OK
-Allow: GET, HEAD, OPTIONS
-Content-Type: application/json
-Vary: Accept
+Response content:
 
 ~~~
 {
