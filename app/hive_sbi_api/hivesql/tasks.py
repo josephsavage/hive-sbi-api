@@ -37,11 +37,11 @@ def setup_periodic_tasks(sender, **kwargs):
         name='set_max_vo_fill_vesting_withdrawn',
     )
 
-    sender.add_periodic_task(
-        crontab(minute='*/45',),
-        sync_older_posts_from_votes.s(),
-        name='sync_older_posts_from_votes',
-    )
+    # sender.add_periodic_task(
+    #     crontab(minute='*/45',),
+    #     sync_older_posts_from_votes.s(),
+    #     name='sync_older_posts_from_votes',
+    # )
 
 
 @app.task(bind=True)
@@ -164,6 +164,7 @@ def sync_empty_votes_posts(self):
     )
 
 
+# Unused code
 @app.task(bind=True)
 def sync_older_posts_from_votes(self):
     min_limit = Member.objects.all().order_by("original_enrollment").first().original_enrollment
