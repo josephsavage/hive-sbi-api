@@ -428,6 +428,15 @@ class Post(models.Model):
     total_rshares = models.BigIntegerField()
     empty_votes = models.BooleanField(default=False)
 
+    has_beneficiaries = models.BooleanField(default=False)
+    # TODO: Remove this field once the beneficiaries update script has finished.
+    updated_beneficiaries = models.BooleanField(default=True)
+
+    # TODO: Remove if confirm that is not used.
+    beneficiaries = models.JSONField(
+        null=True,
+    ) 
+
     def get_hbd_rewards(self):
         hbd_rewards = 0
 

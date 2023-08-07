@@ -299,6 +299,11 @@ def sync_post_votes(self):
                 permlink=hivesql_comment.permlink,
             ).exists():
                 continue
+            
+            has_beneficiaries = False
+
+            if hivesql_comment.beneficiaries:
+                has_beneficiaries = True
 
             post = Post.objects.create(
                 author=hivesql_comment.author,
@@ -310,6 +315,8 @@ def sync_post_votes(self):
                 author_rewards=hivesql_comment.author_rewards,
                 active_votes=hivesql_comment.active_votes,
                 total_rshares=0,
+                has_beneficiaries=has_beneficiaries,
+                beneficiaries=hivesql_comment.beneficiaries,
             )
 
             total_rshares = 0
