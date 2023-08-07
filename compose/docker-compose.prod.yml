@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   app:
-    image: hive_sbi_api:0.1.2
+    image: hive_sbi_api:0.1.3
     build:
       args:
         - DJANGO_ENV=prod
@@ -18,7 +18,7 @@ services:
       - redis-data:/data
 
   worker:
-    image: hive_sbi_api:0.1.2
+    image: hive_sbi_api:0.1.3
     environment:
       - DJANGO_SETTINGS_MODULE=hive_sbi_api.settings.prod
     build:
@@ -26,7 +26,7 @@ services:
         - DJANGO_ENV=prod
 
   beat:
-    image: hive_sbi_api:0.1.2
+    image: hive_sbi_api:0.1.3
     environment:
       - DJANGO_SETTINGS_MODULE=hive_sbi_api.settings.prod
     build:
