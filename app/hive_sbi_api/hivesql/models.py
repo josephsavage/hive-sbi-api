@@ -24,6 +24,9 @@ class HiveSQLComment(models.Model):
     active_votes = models.JSONField()
     beneficiaries = models.JSONField()
 
+    percent_hbd = models.SmallIntegerField()
+    curator_payout_value = models.FloatField()
+
     def __str__(self):
         return "{} - {}".format(self.permlink, self.author)
 

@@ -177,6 +177,8 @@ class PostAdmin(admin.ModelAdmin):
         'total_rshares',
         'empty_votes',
         'beneficiaries',
+        'percent_hbd',
+        'curator_payout_value',
     ]
 
 

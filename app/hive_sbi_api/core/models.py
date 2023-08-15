@@ -435,7 +435,17 @@ class Post(models.Model):
     # TODO: Remove if confirm that is not used.
     beneficiaries = models.JSONField(
         null=True,
-    ) 
+    )
+
+    percent_hbd = models.SmallIntegerField(
+        null=True,
+        blank=True,
+    )
+
+    curator_payout_value = models.FloatField(
+        null=True,
+        blank=True,
+    )
 
     def get_hbd_rewards(self):
         hbd_rewards = 0
