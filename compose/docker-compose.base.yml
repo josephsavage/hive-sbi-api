@@ -6,7 +6,7 @@ services:
       - ./compose/nginx:/etc/nginx/conf.d
       - ./app:/app
     ports:
-      - "${PORT_NGINX}:5009"
+      - "5009:5009"
     depends_on:
       - app
     networks:
@@ -32,7 +32,7 @@ services:
       - sbi-bridge
 
   worker:
-    image: ${IMAGE_SERVICE}
+    image: hive_sbi_api:0.1.0
     build: ./app
     volumes:
       - ./app:/app
@@ -45,7 +45,7 @@ services:
       - sbi-bridge
 
   beat:
-    image: ${IMAGE_SERVICE}
+    image: hive_sbi_api:0.1.0
     build: ./app
     volumes:
       - ./app:/app
