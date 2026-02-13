@@ -64,13 +64,13 @@ Application will be exposed on port http://localhost:8009 and through NGINX on p
 ### Build app image
 
 ~~~
-$ docker build app -t hive_sbi_api:0.1.0 --build-arg DJANGO_ENV=prod
+docker build app -t hive_sbi_api:0.1.0 --build-arg DJANGO_ENV=prod
 ~~~
 
 or
 
 ~~~
-$ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.prod.yml build
+PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.prod.yml build
 ~~~
 
 ### run service
