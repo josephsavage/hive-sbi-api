@@ -1,17 +1,5 @@
 version: "3.7"
 services:
-  nginx:
-    image: nginx:1.19.8
-    volumes:
-      - ./compose/nginx:/etc/nginx/conf.d
-      - ./app:/app
-    ports:
-      - "5009:5009"
-    depends_on:
-      - app
-    networks:
-      - sbi-bridge
-
   postgres:
     image: postgres:11.0-alpine
     env_file: .env
@@ -19,7 +7,8 @@ services:
       - sbi-bridge
 
   app:
-    build: ./app
+    build:
+      context: ../app
     env_file: .env
     depends_on:
       - postgres
@@ -33,9 +22,10 @@ services:
 
   worker:
     image: hive_sbi_api:0.1.0
-    build: ./app
+    build:
+      context: ../app
     volumes:
-      - ./app:/app
+      - ../app:/app
     env_file: .env
     depends_on:
       - app
@@ -46,9 +36,10 @@ services:
 
   beat:
     image: hive_sbi_api:0.1.0
-    build: ./app
+    build:
+      context: ../app
     volumes:
-      - ./app:/app
+      - ../app:/app
     env_file: .env
     depends_on:
       - worker
