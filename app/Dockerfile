@@ -4,6 +4,7 @@ ARG DJANGO_ENV
 
 ADD hive_sbi_api             /app/hive_sbi_api
 ADD boot_scripts             /app/boot_scripts
+RUN chmod +x /app/boot_scripts/*.sh
 ADD requirements             /app/requirements
 ADD requirements.txt         /app/requirements.txt
 ADD manage.py                /app/manage.py
