@@ -116,7 +116,7 @@ def sync_empty_votes_posts(self):
         votes_for_create = []
         total_rshares = 0
 
-        for vote in post.active_votes:
+        for vote in PostVotes.objects.get(post_id=post.id).active_votes:
             total_rshares = total_rshares + int(vote["rshares"])
 
             if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(post=post, voter=vote["voter"]):
@@ -323,7 +323,7 @@ def sync_post_votes(self):
 
             total_rshares = 0
 
-            for vote in post.active_votes:
+            for vote in PostVotes.objects.get(post_id=post.id).active_votes:
                 total_rshares = total_rshares + int(vote["rshares"])
 
                 if vote["voter"] in VOTER_ACCOUNTS and not Vote.objects.filter(post=post, voter=vote["voter"]):
