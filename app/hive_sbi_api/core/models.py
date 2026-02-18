@@ -20,8 +20,8 @@ class PostVotes(models.Model):
         related_name="votes_payload",
         primary_key=True,
     )
-    active_votes = models.JSONField(null=True, blank=True)
-    beneficiaries = models.JSONField(null=True, blank=True)
+#    active_votes = models.JSONField(null=True, blank=True)
+#    beneficiaries = models.JSONField(null=True, blank=True)
 
     class Meta:
         db_table = "core_post_votes"
