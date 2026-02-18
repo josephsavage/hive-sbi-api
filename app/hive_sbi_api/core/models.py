@@ -11,7 +11,21 @@ from .data import (TRX_SOURCE_CHOICES,
 
 logger = logging.getLogger('v1')
 
- 
+# app/hive_sbi_api/core/models.py
+
+class PostVotes(models.Model):
+    post = models.OneToOneField(
+        "core.Post",
+        on_delete=models.CASCADE,
+        related_name="votes_payload",
+        primary_key=True,
+    )
+    active_votes = models.JSONField(null=True, blank=True)
+    beneficiaries = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        db_table = "core_post_votes"
+      
 class Configuration(models.Model):
     share_cycle_min = models.FloatField(
         default=144,
