@@ -9,10 +9,6 @@ services:
       - "8009"
     command: ["sh", "/app/boot_scripts/app.sh"]
 
-  postgres:
-    volumes:
-      - db-data:/var/lib/postgresql/data/
-
   redis:
     volumes:
       - redis-data:/data
