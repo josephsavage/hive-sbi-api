@@ -60,6 +60,8 @@ Application will be exposed on port http://localhost:8009 and through NGINX on p
 
 
 # PRODUCTION ENVIRONMENT
+Note: This project uses Docker Compose v2 (docker compose).
+Do not use the deprecated docker-compose binary, as it cannot manage v2-created containers.
 
 ### Build app image
 
@@ -73,7 +75,7 @@ docker compose -f compose/docker-compose.base.yml -f compose/docker-compose.prod
 ### run service
 
 ~~~
-PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose \
+PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker compose \
   --project-directory=$(pwd) \
   -f compose/docker-compose.base.yml \
   -f compose/docker-compose.prod.yml \
@@ -81,7 +83,7 @@ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose \
 ~~~
 
 ~~~
-PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose \
+PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker compose \
   --project-directory=$(pwd) \
   -f compose/docker-compose.base.yml \
   -f compose/docker-compose.prod.yml \
