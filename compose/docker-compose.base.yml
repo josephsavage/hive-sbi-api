@@ -24,8 +24,8 @@ services:
     image: hive_sbi_api:0.1.0
     build:
       context: ../app
-    volumes:
-      - ../app:/app
+#    volumes:
+#      - ../app:/app
     env_file: .env
     depends_on:
       - app
@@ -38,8 +38,8 @@ services:
     image: hive_sbi_api:0.1.0
     build:
       context: ../app
-    volumes:
-      - ../app:/app
+#    volumes:
+#      - ../app:/app
     env_file: .env
     depends_on:
       - worker
