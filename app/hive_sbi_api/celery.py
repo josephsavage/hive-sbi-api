@@ -1,6 +1,9 @@
 import os
 import django
+import multiprocessing
+
 from celery import Celery
+multiprocessing.set_start_method("fork", force=True)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hive_sbi_api.settings")
 
