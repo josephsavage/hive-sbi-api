@@ -69,11 +69,6 @@ docker compose -f compose/docker-compose.base.yml -f compose/docker-compose.prod
   up -d --force-recreate app worker
 ~~~
 
-or
-
-~~~
-PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.prod.yml build
-~~~
 
 ### run service
 
