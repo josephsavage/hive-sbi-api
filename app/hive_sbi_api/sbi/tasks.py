@@ -13,6 +13,7 @@ from django_celery_results.models import TaskResult
 
 from django.db.utils import IntegrityError
 from django.forms.models import model_to_dict
+from django.db import transaction
 
 from hive_sbi_api.sbi.models import (SBIMember,
                                      SBIConfiguration,
@@ -107,6 +108,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
 
 @app.task(bind=True)
+@transaction.atomic
 def sync_trx(self):
     pending_transactions = SBITransaction.objects.all()
 
@@ -225,6 +227,7 @@ def sync_conf():
 
 
 @app.task(bind=True)
+@transaction.atomic
 def sync_members(self):
     sync_conf()
 
@@ -236,6 +239,7 @@ def sync_members(self):
     members_to_update = []
 
     failured_members_sync = {}
+    
 
     for sbi_member in SBImembers:
         # Validate negative values FOR curation_rshares,
@@ -250,17 +254,14 @@ def sync_members(self):
         if other_rshares < 0:
             other_rshares = 0
 
-        other_rshares = sbi_member.other_rshares
-
-        if other_rshares < 0:
-            other_rshares = 0
-
         rewarded_rshares = sbi_member.rewarded_rshares
 
         if rewarded_rshares < 0 or rewarded_rshares is None:
             rewarded_rshares = 0
-
-        pending_balance = sbi_member.balance_rshares / sbi_conf.minimum_vote_threshold * 0.02
+        mvt = sbi_conf.minimum_vote_threshold
+        if not mvt:
+            raise ValueError("minimum_vote_threshold must be > 0")
+        pending_balance = sbi_member.balance_rshares / mvt * 0.02
         next_upvote_estimate = pending_balance / sbi_conf.comment_vote_divider
         estimate_rewarded = rewarded_rshares / sbi_conf.minimum_vote_threshold * 0.02
 
@@ -268,21 +269,10 @@ def sync_members(self):
 
         # Validate boolean fields.
         # hivewatchers and buildawhale. 
-        hivewatchers = sbi_member.hivewatchers
-
-        if hivewatchers is None:
-            hivewatchers = False
-
-        buildawhale = sbi_member.buildawhale
-
-        if buildawhale is None:
-            buildawhale = False
-
-        comment_upvote = sbi_member.comment_upvote
-
-        if comment_upvote is None:
-            comment_upvote = False
-
+        hivewatchers   = bool(sbi_member.hivewatchers)
+        buildawhale    = bool(sbi_member.buildawhale)
+        comment_upvote = bool(sbi_member.comment_upvote)
+      
         data_dict = {
             'note': sbi_member.note,
             'shares': sbi_member.shares,
@@ -330,7 +320,10 @@ def sync_members(self):
                 members_to_update.append(obj)
 
         except IntegrityError as e:
-            failured_members_sync[sbi_member.account] = "{}".format(e)
+            failured_members_sync[sbi_member.account] = {
+                "error": f"{type(e).__name__}: {e}",
+                "data": data_dict,
+            }
             continue
 
     updated_member = Member.objects.bulk_update(
