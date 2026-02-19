@@ -64,7 +64,9 @@ Application will be exposed on port http://localhost:8009 and through NGINX on p
 ### Build app image
 
 ~~~
-docker build app -t hive_sbi_api:0.1.0 --build-arg DJANGO_ENV=prod
+docker build app -t hive_sbi_api:0.1.0 --build-arg DJANGO_ENV=prod --no-cache && \
+docker compose -f compose/docker-compose.base.yml -f compose/docker-compose.prod.yml \
+  up -d --force-recreate app worker
 ~~~
 
 or
