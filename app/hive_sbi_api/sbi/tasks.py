@@ -6,14 +6,16 @@ from datetime import datetime
 from datetime import timedelta
 
 from celery import (current_app,
-                    states as celery_states)
+                    states as celery_states,
+                    shared_task)
 from celery.exceptions import Ignore
 from celery.schedules import crontab
+
 from django_celery_results.models import TaskResult
 
 from django.db.utils import IntegrityError
 from django.forms.models import model_to_dict
-from django.db import transaction
+from django.db import transaction, IntegrityError
 
 from hive_sbi_api.sbi.models import (SBIMember,
                                      SBIConfiguration,
@@ -32,6 +34,7 @@ from hive_sbi_api.core.serializers import SBITransactionSerializer
 
 from hive_sbi_api.hivesql.tasks import sync_post_votes
 
+BATCH_SIZE = 1000
 
 logger = logging.getLogger('sbi')
 
@@ -107,8 +110,7 @@ def setup_periodic_tasks(sender, **kwargs):
     )
 
 
-@app.task(bind=True)
-@transaction.atomic
+@shared_task(bind=True)
 def sync_trx(self):
     pending_transactions = SBITransaction.objects.all()
 
@@ -226,22 +228,74 @@ def sync_conf():
     conf.save()
 
 
-@app.task(bind=True)
-@transaction.atomic
+@shared_task(bind=True)
 def sync_members(self):
     sync_conf()
 
     sbi_conf = Configuration.objects.first()
+    if not sbi_conf:
+      raise ValueError("Configuration not found")
 
-    SBImembers = SBIMember.objects.all()
 
     created_members = 0
-    members_to_update = []
+    updated_members = 0
 
     failured_members_sync = {}
-    
+    qs = (
+        SBIMember.objects
+        .all()
+        .order_by("pk")
+        .iterator(chunk_size=BATCH_SIZE)
+    )
 
-    for sbi_member in SBImembers:
+    members_to_update = []
+    
+    def flush_updates():
+        nonlocal updated_members, members_to_update
+
+        if not members_to_update:
+            return
+
+        # small, bounded bulk_update inside its own transaction
+        with transaction.atomic():
+            Member.objects.bulk_update(
+                members_to_update,
+                [
+                    'note',
+                    'shares',
+                    'bonus_shares',
+                    'total_shares',
+                    'total_share_days',
+                    'avg_share_age',
+                    'last_comment',
+                    'last_post',
+                    'latest_enrollment',
+                    'flags',
+                    'earned_rshares',
+                    'subscribed_rshares',
+                    'curation_rshares',
+                    'delegation_rshares',
+                    'other_rshares',
+                    'rewarded_rshares',
+                    'pending_balance',
+                    'next_upvote_estimate',
+                    'estimate_rewarded',
+                    'balance_rshares',
+                    'total_rshares',
+                    'upvote_delay',
+                    'updated_at',
+                    'first_cycle_at',
+                    'last_received_vote',
+                    'blacklisted',
+                    'hivewatchers',
+                    'buildawhale',
+                    'comment_upvote',
+                ],
+            )
+        updated_members += len(members_to_update)
+        members_to_update = []
+
+    for sbi_member in qs:
         # Validate negative values FOR curation_rshares,
         # and other_rshares, rewarded_rshares.
         curation_rshares = sbi_member.curation_rshares
@@ -318,6 +372,10 @@ def sync_members(self):
                 for attr, value in data_dict.items(): 
                     setattr(obj, attr, value)
                 members_to_update.append(obj)
+              
+                if len(members_to_update) >= BATCH_SIZE:
+                    flush_updates()
+
 
         except IntegrityError as e:
             failured_members_sync[sbi_member.account] = {
@@ -325,41 +383,9 @@ def sync_members(self):
                 "data": data_dict,
             }
             continue
-
-    updated_member = Member.objects.bulk_update(
-        members_to_update,
-        [
-            'note',
-            'shares',
-            'bonus_shares',
-            'total_shares',
-            'total_share_days',
-            'avg_share_age',
-            'last_comment',
-            'last_post',
-            'latest_enrollment',
-            'flags',
-            'earned_rshares',
-            'subscribed_rshares',
-            'curation_rshares',
-            'delegation_rshares',
-            'other_rshares',
-            'rewarded_rshares',
-            'pending_balance',
-            'next_upvote_estimate',
-            'estimate_rewarded',
-            'balance_rshares',
-            'total_rshares',
-            'upvote_delay',
-            'updated_at',
-            'first_cycle_at',
-            'last_received_vote',
-            'blacklisted',
-            'hivewatchers',
-            'buildawhale',
-            'comment_upvote',
-        ]
-    )
+          
+    # flush any remaining updates
+    flush_updates()
 
     sync_trx.delay()
     sync_post_votes.delay()
@@ -369,10 +395,9 @@ def sync_members(self):
             state=celery_states.FAILURE,
             meta=failured_members_sync,
         )
-
         raise Ignore()
 
-    return "Created {} members. Updated {} members".format(created_members, updated_member)
+    return f"Created {created_members} members. Updated {updated_members} members"
 
 
 @app.task
