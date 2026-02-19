@@ -67,7 +67,7 @@ Do not use the deprecated docker-compose binary, as it cannot manage v2-created 
 
 ~~~
 docker build app -t hive_sbi_api:0.1.0 --build-arg DJANGO_ENV=prod --no-cache && \
-docker compose -f compose/docker-compose.base.yml -f compose/docker-compose.prod.yml \
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml \
   up -d --force-recreate app worker
 ~~~
 
@@ -77,16 +77,16 @@ docker compose -f compose/docker-compose.base.yml -f compose/docker-compose.prod
 ~~~
 PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker compose \
   --project-directory=$(pwd) \
-  -f compose/docker-compose.base.yml \
-  -f compose/docker-compose.prod.yml \
+  -f docker-compose.base.yml \
+  -f docker-compose.prod.yml \
   down
 ~~~
 
 ~~~
 PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker compose \
   --project-directory=$(pwd) \
-  -f compose/docker-compose.base.yml \
-  -f compose/docker-compose.prod.yml \
+  -f docker-compose.base.yml \
+  -f docker-compose.prod.yml \
   up -d
 
 ~~~
