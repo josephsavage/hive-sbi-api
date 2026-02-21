@@ -1,0 +1,55 @@
+services:
+  webapp:
+    build: 
+      context: ./webapp/app
+      args:
+        - DJANGO_ENV=prod
+    env_file: .env
+    ports:
+      # Bind exclusively to localhost so it isn't exposed to the open web
+      - "127.0.0.1:5008:8008" 
+    restart: unless-stopped
+
+  api:
+    build: 
+      context: ./api/app
+      args:
+        - DJANGO_ENV=prod
+    env_file: .env
+    extra_hosts:
+      # This allows the container to connect to the bare-metal Postgres
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:5009:8009"
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    # No ports exposed; strictly internal communication
+
+  celery_worker:
+    build: 
+      context: ./api/app
+      args:
+        - DJANGO_ENV=prod
+    command: celery -A hive_sbi_api worker -l info
+    env_file: .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  celery_beat:
+    build: 
+      context: ./api/app
+      args:
+        - DJANGO_ENV=prod
+    command: celery -A hive_sbi_api beat -l info
+    env_file: .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+    restart: unless-stopped
