@@ -1,0 +1,123 @@
+{% extends 'layout/base.html' %}
+
+{% load static %}
+
+{% block title %}User Info{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="text-dark">Get User Info Form</h5>
+  </div>
+  <div class="card-body">
+    <form method="get">
+      <div class="mb-3">
+        <label class="form-label">{{ userinfo_form.user.label_tag }}</label>
+        {{ userinfo_form.user }}
+
+        {% if userinfo_form.user.errors %}
+        <ul class="list-unstyled">
+          {% for error in userinfo_form.user.errors %}
+          <li  class="alert-dismissible fade show alert alert-danger" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-dark">Search</button>
+    </form>
+  </div>
+</div>
+
+<div class="padding-top-15px"></div>
+
+{% if user %}
+<a href="{% url 'enrolled_hive_sbi' %}?user={{ user }}" class="btn btn-outline-dark btn-sm">Transaction history</a>
+<a href="{% url 'delivered_votes' %}?user={{ user }}" class="btn btn-outline-dark btn-sm">Delivered votes</a>
+
+<div class="padding-top-15px"></div>
+
+<div class="row">
+  <div class="col-md-6 col-sm-12">
+    {% if userinfo_hive.success %}
+    <div class="card">
+      <div class="card-header">
+        <h5 class="text-dark">Hive User Info</h5>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{ user }}</h5>
+
+        <dl class="row">
+          <dt class="col-sm-4">Total units</dt>
+          <dd class="col-sm-8">{{ userinfo_hive.data.totalShares }}</dd>
+
+          <dt class="col-sm-4">Units</dt>
+          <dd class="col-sm-8">{{ userinfo_hive.data.shares }}</dd>
+
+          <dt class="col-sm-4">Bonus Units</dt>
+          <dd class="col-sm-8">{{ userinfo_hive.data.bonusShares }}</dd>
+
+          <dt class="col-sm-4">Balance value estimate</dt>
+          <dd class="col-sm-8">{{ userinfo_hive.data.estimateBalanceValue }}</dd>
+
+          <dt class="col-sm-4">Next vote estimate</dt>
+          <dd class="col-sm-8">{{ userinfo_hive.data.estimatedNextVote }}</dd>
+
+          <dt class="col-sm-4">Rewarded estimate</dt>
+          <dd class="col-sm-8">{{ userinfo_hive.data.estimateRewarded }}</dd>
+
+          {% if userinfo_hive.data.skiplisted %}
+          <dt class="col-sm-4">Skiplist</dt>
+          <dd class="col-sm-8">{{ userinfo_hive.data.skiplisted }}</dd>
+          {% endif %}
+       </dl>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-secondary" role="alert">
+      <strong>User Info:</strong> Not information for user <strong>{{ user }}</strong>!<br>
+      {{ userinfo_hive.error }}
+    </div>
+    {% endif %}  
+  </div>
+
+  <div class="col-md-6 col-sm-12">
+    {% if userinfo.success %}
+    <div class="card">
+      <div class="card-header">
+        <h5 class="text-dark">Steem User Info</h5>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{ user }}</h5>
+
+        <dl class="row">
+          <dt class="col-sm-4">Units</dt>
+          <dd class="col-sm-8">{{ userinfo.data.shares }}</dd>
+
+          <dt class="col-sm-4">Bonus Units</dt>
+          <dd class="col-sm-8">{{ userinfo.data.bonusShares }}</dd>
+
+          <dt class="col-sm-4">Balance value estimate</dt>
+          <dd class="col-sm-8">{{ userinfo.data.estimateBalanceValue }}</dd>
+
+          <dt class="col-sm-4">Next vote estimate</dt>
+          <dd class="col-sm-8">{{ userinfo.data.estimatedNextVote }}</dd>
+
+          <dt class="col-sm-4">Rewarded estimate</dt>
+          <dd class="col-sm-8">{{ userinfo.data.estimateRewarded }}</dd>
+       </dl>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-secondary" role="alert">
+      <strong>Steem User Info:</strong> No information for user <strong>{{ user }}</strong>!<br>
+      {{ userinfo.error }}
+    </div>
+    {% endif %}
+  </div>
+</div>  
+{% endif %}
+{% endblock %}
