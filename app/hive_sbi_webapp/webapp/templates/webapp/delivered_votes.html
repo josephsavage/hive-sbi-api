@@ -1,0 +1,160 @@
+{% extends 'layout/base.html' %}
+
+{% load static custom_tags %}
+
+{% block title %}Delivered votes{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="text-dark">Delivered votes</h5>
+  </div>
+
+  <div class="card-body">
+    <form method="get">
+      <div class="mb-3">
+        <label class="form-label">{{ userinfo_form.user.label_tag }}</label>
+        {{ userinfo_form.user }}
+
+        {% if userinfo_form.user.errors %}
+        <ul class="list-unstyled">
+          {% for error in userinfo_form.user.errors %}
+          <li  class="alert-dismissible fade show alert alert-danger" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-dark">Search</button>
+    </form>
+
+    {% if posts.results %}
+    <br>
+    <nav class="d-flex bd-highlight mb-3">
+      {% if user %}
+      <div class="p-2 bd-highlight">
+        <h3>{{ user }}</h3>
+      </div>
+      {% endif %}
+
+      <ul class="pagination ms-auto p-2 bd-highlight">
+        <li class="page-item {% if not posts.previous %}disabled{% endif %}">
+          <a class="page-link {% if posts.previous %}text-dark{% else %}text-muted{% endif %}" href="?{{ posts.previous }}">Previous</a>
+        </li>
+
+        {% if posts.prev_page_number %}
+        <li class="page-item"><a class="page-link text-dark" href="?{{ posts.previous }}">{{ posts.prev_page_number }}</a></li>
+        {% endif %}
+
+        <li class="page-item active"><a class="page-link bg-dark" style="border-color:black;" href="#">{{ posts.active_page_number }}</a></li>
+
+        {% if posts.next_page_number %}
+        <li class="page-item"><a class="page-link text-dark" href="?{{ posts.next }}">{{ posts.next_page_number }}</a></li>
+        {% endif %}
+
+        <li class="page-item {% if not posts.next %}disabled{% endif %}">
+          <a class="page-link {% if posts.next %}text-dark{% else %}text-muted{% endif %}" href="?{{ posts.next }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              Date
+
+              <a href="{% if user %}?ordering=created&user={{user}}{% else %}?ordering=created{% endif %}" class="text-decoration-none">
+                {% if created_ascending_active %}
+                <i class="bi bi-arrow-up-circle-fill text-dark"></i>
+                {% else %}
+                <i class="bi bi-arrow-up-circle text-dark"></i>
+                {% endif %}
+              </a>
+              <a href="{% if user %}?ordering=-created&user={{user}}{% else %}?ordering=-created{% endif %}" class="text-decoration-none">
+                {% if created_descending_active %}
+                <i class="bi bi-arrow-down-circle-fill text-dark"></i>
+                {% else %}
+                <i class="bi bi-arrow-down-circle text-dark"></i>
+                {% endif %}
+              </a>
+            </th>
+            {% if not user %}
+            <th>Author</th>
+            {% endif %}
+            <th>Title</th>
+            <th>HP received</th>
+
+            {% comment %}<th>Hive received</th>{% endcomment %}
+
+            <th>HBD received</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for post in posts.results %}
+          {% string_to_json post.vote_set as post_votes %}
+          <tr data-title="{{ post.title }}" data-post-votes="{{ post_votes }}">
+            <td style="width: 20%">{% timestamp_to_datetime post.created as created %}{{ created }}</td>
+            {% if not user %}
+            <td>{{ post.author }}</td>
+            {% endif %}
+            <td><a href="https://peakd.com/@{{ post.author}}/{{ post.permlink }}" target="_blank">{% if post.title %}{{ post.title }}{% else %}{{ post.permlink }}{% endif %}</a></td>
+            <td>{{ post.hive_power_rewards }}</td>
+
+            {% comment %}<td>?</td>{% endcomment %}
+
+            <td>{{ post.hbd_rewards }}</td>
+            <td>
+              <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#deliveredVotesModal" class="delivered_votes_modal_link">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal fade" id="deliveredVotesModal" tabindex="-1" aria-labelledby="deliveredVotesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deliveredVotesModalLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Voter</th>
+                    <th>HP received</th>
+                    <th>HBD received</th>
+                  </tr>
+                </thead>
+                <tbody id="idPostVotesTBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <br>
+    <p>No delivered votes for <strong>{{ user }}</strong>.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extrascript %}
+<script src="{% static 'assets/js/delivered_votes.js' %}"></script>
+{% endblock %}
