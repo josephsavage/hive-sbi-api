@@ -9,9 +9,8 @@ celery==5.2.3
 redis==4.1.4
 pandas==1.5.1
 numpy==1.26.4
-
+django-cookie-law==2.1.1
 Django==4.0.2
-
+python-dotenv
 django-filter==21.1
 django-celery-results==2.3.0
-mssql-django==1.1.3
