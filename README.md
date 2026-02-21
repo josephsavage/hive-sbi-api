@@ -1,15 +1,9 @@
 # hive-sbi-api
 
-Docker compose  V3.7 deployment
+Docker compose  V5.0 deployment
 ===============================
 
-### Network
 
-Create a network with the `bridge` driver:
-
-~~~
-$ docker network create --driver bridge sbi-bridge
-~~~
 
 ### Set environment variables
 
@@ -29,8 +23,8 @@ SECRET_KEY=Secret
 
 POSTGRES_DB=DB
 POSTGRES_USER=USER
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
+POSTGRES_HOST=host.docker.internal
+POSTGRES_PORT=5434
 POSTGRES_PASSWORD=XXXpasswordXXX
 
 SBI_DB_NAME=DB
@@ -42,56 +36,21 @@ SBI_DB_PORT=port
 
 **Change SECRET_KEY for a long and secure string.**
 
-# DEVELOPMENT ENVIRONMENT
-
-### Build app image
-
-~~~
-$ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.dev.yml build
-~~~
-
-### run service
-
-~~~
-$ PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker-compose --project-directory=$(pwd) -f compose/docker-compose.base.yml -f compose/docker-compose.dev.yml up
-~~~
-
-Application will be exposed on port http://localhost:8009 and through NGINX on port http://localhost:5009.
-
-
 # PRODUCTION ENVIRONMENT
 Note: This project uses Docker Compose v2 (docker compose).
 Do not use the deprecated docker-compose binary, as it cannot manage v2-created containers.
 
-### Build app image
+### Build app image & run service
 
 ~~~
-docker build app -t hive_sbi_api:0.1.0 --build-arg DJANGO_ENV=prod --no-cache && \
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml \
-  up -d --force-recreate app worker
+docker compose up -d --build
 ~~~
 
 
-### run service
+~~~
+docker compose down
 
 ~~~
-PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker compose \
-  --project-directory=$(pwd) \
-  -f docker-compose.base.yml \
-  -f docker-compose.prod.yml \
-  down
-~~~
-
-~~~
-PORT_NGINX=5009 PORT_DEBUG=8009 IMAGE_SERVICE=$(basename $PWD) docker compose \
-  --project-directory=$(pwd) \
-  -f docker-compose.base.yml \
-  -f docker-compose.prod.yml \
-  up -d
-
-~~~
-
-Application will be exposed through NGINX on port http://localhost:5009.
 
 
 # SYNCHRONIZATION TASK
