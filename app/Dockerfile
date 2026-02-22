@@ -1,13 +1,23 @@
 FROM python:3.9.10
 
-ARG DJANGO_ENV
+ARG DJANGO_ENV=prod
 
 WORKDIR /app/
 
-# Install proper dependencies for PostgreSQL and MariaDB (Removing MS SQL)
+# Install PostgreSQL, MariaDB, and MS SQL prerequisites
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     default-libmysqlclient-dev \
+    curl \
+    gnupg2 \
+    # Add Microsoft repository keys and sources for Debian 11
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    # Update and install MS SQL drivers
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
+    && apt-get install -y unixodbc-dev \
+    # Clean up apt cache to keep image size small
     && rm -rf /var/lib/apt/lists/*
 
 # Add requirements and install first to leverage Docker layer caching
@@ -17,9 +27,7 @@ RUN pip install --upgrade pip && \
     pip install -r requirements/$DJANGO_ENV.txt
 
 # Add the rest of the application files
-ADD hive_sbi_api /app/hive_sbi_api
-ADD boot_scripts /app/boot_scripts
-ADD manage.py /app/manage.py
+ADD . /app/
 
 RUN chmod +x /app/boot_scripts/*.sh
 
@@ -32,8 +40,4 @@ ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV DJANGO_ENV=$DJANGO_ENV
 
-# Switch to the unprivileged user for security
-USER app
-
-# Fix the directory typo to correctly target boot_scripts
-CMD sh /app/boot_scripts/$DJANGO_ENV.sh
+CMD sh /app/boot_scripts/app.sh

@@ -1,9 +1,11 @@
 from .base import *
+import oso
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = False
 
-ALLOWED_HOSTS = ['api.hivesbi.com']
+#ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "api.hivesbi.com,api,webapp,localhost").split(",")
+ALLOWED_HOSTS = ['api.hivesbi.com', 'api', 'webapp', 'localhost', '127.0.0.1', 'www.hivesbi.com', '172.18.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['https://api.hivesbi.com',]
 

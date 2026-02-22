@@ -1,23 +1,33 @@
 services:
   webapp:
     build: 
-      context: ./webapp/app
+      context: ./app
       args:
         - DJANGO_ENV=prod
     env_file: .env
+    # Override settings for the webapp module
+    environment:
+      - DJANGO_SETTINGS_MODULE=hive_sbi_webapp.settings.prod
+    # Run the webapp's specific gunicorn server
+    command: >
+      sh -c "python manage.py migrate && 
+             python manage.py collectstatic --noinput && 
+             su -m app -c 'gunicorn hive_sbi_webapp.wsgi -b :8008'"
+    volumes:
+      # Persist the SQLite database file
+      - webapp_data:/app/db.sqlite3
+      - ./app/static:/app/static
     ports:
-      # Bind exclusively to localhost so it isn't exposed to the open web
       - "127.0.0.1:5008:8008" 
     restart: unless-stopped
 
   api:
     build: 
-      context: ./api/app
+      context: ./app
       args:
         - DJANGO_ENV=prod
     env_file: .env
     extra_hosts:
-      # This allows the container to connect to the bare-metal Postgres
       - "host.docker.internal:host-gateway"
     ports:
       - "127.0.0.1:5009:8009"
@@ -26,14 +36,32 @@ services:
   redis:
     image: redis:alpine
     restart: unless-stopped
-    # No ports exposed; strictly internal communication
 
   celery_worker:
     build: 
-      context: ./api/app
+      context: ./app
       args:
         - DJANGO_ENV=prod
-    command: celery -A hive_sbi_api worker -l info
+    # Overriding the script to add safety limits
+    command: celery -A hive_sbi_api worker -l info --concurrency=1 --max-tasks-per-child=10
+    env_file: .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    # Physical hardware limit
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  celery_beat:
+    build: 
+      context: ./app
+      args:
+        - DJANGO_ENV=prod
+    command: sh /app/boot_scripts/beat.sh
     env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -41,15 +69,5 @@ services:
       - redis
     restart: unless-stopped
 
-  celery_beat:
-    build: 
-      context: ./api/app
-      args:
-        - DJANGO_ENV=prod
-    command: celery -A hive_sbi_api beat -l info
-    env_file: .env
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - redis
-    restart: unless-stopped
+volumes:
+  webapp_data:

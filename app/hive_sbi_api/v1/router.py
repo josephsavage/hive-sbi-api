@@ -6,6 +6,7 @@ from .views import (MemberViewSet,
 
 
 router = routers.DefaultRouter()
+router.register(r'users', MemberViewSet)
 router.register(r'members', MemberViewSet)
 router.register(r'transactions', TransactionViewSet)
 router.register(r'posts', PostViewSet)

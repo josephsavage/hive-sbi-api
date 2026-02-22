@@ -6,7 +6,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 from django.shortcuts import render
-from .utils.metabase import signed_dashboard_url
+from utils.metabase import signed_dashboard_url
 
 def richlist_view(request):
     iframe_url = settings.METABASE_SITE_URL
